@@ -29,7 +29,7 @@ analyze_trialtypes['Healthy Lab'] = True
 analyze_trialtypes['CVA GRAIL'] = True
 
 # Set wether or not a saved .pkl file can be found in you directory (stroredfile = True / False)
-storedfile = True
+storedfile = False
 
 if storedfile == True:
     filename = 'validation_study_dataset.pkl'

@@ -445,7 +445,7 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
         for key in count:
             if count[key] < 4-len(missingsensors):
                 missingpackets = np.append(missingpackets, key)
-        print("Measurement " + str(filepaths['LeftFoot'][132:151]) +" contains " + str(len(missingpackets)) + " missing packets in available sensordata")
+        # print("Measurement " + str(filepaths['LeftFoot'][132:151]) +" contains " + str(len(missingpackets)) + " missing packets in available sensordata")
         
         # Remove missing packets
         dataleft = dataleft[~dataleft['PacketCounter'].isin(missingpackets)]
