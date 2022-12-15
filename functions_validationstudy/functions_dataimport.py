@@ -31,11 +31,11 @@ def dataimport(datafolder, trialtype):
     errors = dict()
        
     # Set subfolder for xsens data
-    subfolderxsens = '/Xsens/exported'
+    subfolderxsens = 'Xsens/exported'
     
     # Define if vicon data is from GRAIL (../GRAIL/..) or overground lab (../GBA/..) trials
-    subfolderviconGRAIL = 'Vicon/GRAIL/Nexus/C3D na labeling & gapfilling'
-    subfolderviconGBA = 'Vicon/GBA/C3D na labeling & gapfilling'
+    subfolderviconGRAIL = 'Vicon/GRAIL'
+    subfolderviconGBA = 'Vicon/GBA'
     
     # Define xsens trialnumber with corresponding vicon measurement
     corresponding_files = dict()
@@ -44,7 +44,7 @@ def dataimport(datafolder, trialtype):
     
     # HEALTHY GRAIL TRIALS
     if trialtype['Healthy GRAIL'] == True:
-        subfolder = '/Gezonde controles'
+        subfolder = '/Healthy_controls'
         mainpath = datafolder + subfolder
         dirnames = os.listdir(mainpath)
         dirnames = [item for item in dirnames if item.startswith('900_V')]
@@ -54,9 +54,9 @@ def dataimport(datafolder, trialtype):
         for i in range(0, len(dirnames)):
             ppfolders.append(mainpath + '/' + dirnames[i])
         for i in range(0, len(ppfolders)):
-            date = os.listdir(ppfolders[i])
-            ppfoldersvicon.append(ppfolders[i] + '/' + date[0] + '/' + subfolderviconGRAIL)
-            ppfoldersxsens.append(ppfolders[i] + '/' + date[0] + subfolderxsens)
+            # date = os.listdir(ppfolders[i])
+            ppfoldersvicon.append(ppfolders[i] + '/' + subfolderviconGRAIL) # + '/' + date[0]
+            ppfoldersxsens.append(ppfolders[i] + '/' + subfolderxsens) # + '/' + date[0]
             
         xsensnum = dict()
         xsensfilepaths = dict()
@@ -283,9 +283,9 @@ def dataimport(datafolder, trialtype):
         for i in range(0, len(dirnames)):
             ppfolders.append(mainpath + '/' + dirnames[i])
         for i in range(0, len(ppfolders)):
-            date = os.listdir(ppfolders[i])
-            ppfoldersvicon.append(ppfolders[i] + '/' + date[0] + '/'+subfolderviconGRAIL)
-            ppfoldersxsens.append(ppfolders[i] + '/' + date[0] + subfolderxsens)
+            # date = os.listdir(ppfolders[i])
+            ppfoldersvicon.append(ppfolders[i] + '/' + subfolderviconGRAIL) # + '/' + date[0]
+            ppfoldersxsens.append(ppfolders[i] + '/' + subfolderxsens) # + '/' + date[0]
             
         # files=dict()
         xsensnum = dict()
@@ -372,7 +372,7 @@ def dataimport(datafolder, trialtype):
     
     # HEALTHY LAB TRIALS
     if trialtype['Healthy Lab'] == True:
-        subfolder = '/Gezonde controles'
+        subfolder = '/Healthy_controls'
         mainpath = datafolder + subfolder
         dirnames = os.listdir(mainpath)
         dirnames = [item for item in dirnames if item.startswith('900_V')]
@@ -382,9 +382,9 @@ def dataimport(datafolder, trialtype):
         for i in range(0, len(dirnames)):
             ppfolders.append(mainpath + '/' + dirnames[i])
         for i in range(0, len(ppfolders)):
-            date = os.listdir(ppfolders[i])
-            ppfoldersvicon.append(ppfolders[i] + '/' + date[0] + '/'+subfolderviconGBA)
-            ppfoldersxsens.append(ppfolders[i] + '/' + date[0] + subfolderxsens)
+            # date = os.listdir(ppfolders[i])
+            ppfoldersvicon.append(ppfolders[i] + '/' + subfolderviconGBA) #+ '/' + date[0] 
+            ppfoldersxsens.append(ppfolders[i] + '/' + subfolderxsens) #+ '/' + date[0]
             
         # files=dict()
         xsensnum = dict()
@@ -400,490 +400,83 @@ def dataimport(datafolder, trialtype):
                             if entry.name == '900_V_pp01_2MWT01.c3d':
                                 xsensnum[entry.name] = '004'
                                 xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_01' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp01_LT02.c3d':
-                                xsensnum[entry.name] = '001'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_01' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp01_LT03.c3d':
-                                xsensnum[entry.name] = '002'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_01' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp01_LT04.c3d':
-                                xsensnum[entry.name] = '003'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_01' in item][0]+xsensnum[entry.name]
                             
-                            elif entry.name == '900_V_pp03_Turn02.c3d':
-                                xsensnum[entry.name] = '001'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_03' in item][0]+xsensnum[entry.name]
                             elif entry.name == '900_V_pp03_SW01.c3d':
                                 xsensnum[entry.name] = '002'
                                 xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_03' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp03_LT01.c3d': 
-                                xsensnum[entry.name] = '003'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_03' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp03_LT03.c3d':
-                                xsensnum[entry.name] = '005'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_03' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp03_LT04.c3d':
-                                xsensnum[entry.name] = '006'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_03' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp03_STS01.c3d': 
-                                xsensnum[entry.name] = '007'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_03' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp03_STS02.c3d':
-                                xsensnum[entry.name] = '008'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_03' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp03_STS03.c3d':
-                                xsensnum[entry.name] = '009'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_03' in item][0]+xsensnum[entry.name]
                             
-                            elif entry.name == '900_V_pp04_Turn02.c3d':
-                                xsensnum[entry.name] = '001'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_04' in item][0]+xsensnum[entry.name]
                             elif entry.name == '900_V_pp04_SW01.c3d':
                                 xsensnum[entry.name] = '002'
                                 xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_04' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp04_LT02.c3d': 
-                                xsensnum[entry.name] = '004'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_04' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp04_LT03.c3d':
-                                xsensnum[entry.name] = '005'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_04' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp04_LT04.c3d':
-                                xsensnum[entry.name] = '006'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_04' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp04_STS01.c3d': 
-                                xsensnum[entry.name] = '007'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_04' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp04_STS02.c3d':
-                                xsensnum[entry.name] = '008'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_04' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp04_STS03.c3d':
-                                xsensnum[entry.name] = '009'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_04' in item][0]+xsensnum[entry.name]
                             
-                            elif entry.name == '900_V_pp05_Turn01.c3d':
-                                xsensnum[entry.name] = '000'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_05' in item][0]+xsensnum[entry.name]
                             elif entry.name == '900_V_pp05_SW01.c3d':
                                 xsensnum[entry.name] = '001'
                                 xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_05' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp05_LT01.c3d': 
-                                xsensnum[entry.name] = '002'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_05' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp05_LT02.c3d':
-                                xsensnum[entry.name] = '003'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_05' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp05_LT03.c3d':
-                                xsensnum[entry.name] = '004'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_05' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp05_STS01.c3d':
-                                xsensnum[entry.name] = '005'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_05' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp05_STS02.c3d':
-                                xsensnum[entry.name] = '006'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_05' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp05_STS03.c3d':
-                                xsensnum[entry.name] = '007'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_05' in item][0]+xsensnum[entry.name]
                             
-                            elif entry.name == '900_V_pp06_Turn01.c3d':
-                                xsensnum[entry.name] = '000'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_06' in item][0]+xsensnum[entry.name]
                             elif entry.name == '900_V_pp06_SW01.c3d':
                                 xsensnum[entry.name] = '001'
                                 xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_06' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp06_LT01.c3d': 
-                                xsensnum[entry.name] = '002'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_06' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp06_LT02.c3d':
-                                xsensnum[entry.name] = '003'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_06' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp06_LT03.c3d':
-                                xsensnum[entry.name] = '004'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_06' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp06_STS01.c3d': 
-                                xsensnum[entry.name] = '005'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_06' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp06_STS02.c3d':
-                                xsensnum[entry.name] = '006'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_06' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp06_STS03.c3d':
-                                xsensnum[entry.name] = '007'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_06' in item][0]+xsensnum[entry.name]
                             
-                            elif entry.name == '900_V_pp07_Turn01.c3d':
-                                xsensnum[entry.name] = '000'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_07' in item][0]+xsensnum[entry.name]
                             elif entry.name == '900_V_pp07_SW03.c3d':
                                 xsensnum[entry.name] = '003'
                                 xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_07' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp07_LT01.c3d': 
-                                xsensnum[entry.name] = '004'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_07' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp07_LT02.c3d':
-                                xsensnum[entry.name] = '005'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_07' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp07_LT03.c3d':
-                                xsensnum[entry.name] = '006'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_07' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp07_STS01.c3d': 
-                                xsensnum[entry.name] = '007'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_07' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp07_STS02.c3d':
-                                xsensnum[entry.name] = '008'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_07' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp07_STS03.c3d':
-                                xsensnum[entry.name] = '009'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_07' in item][0]+xsensnum[entry.name]
                             
-                            elif entry.name == '900_V_pp08_Turn01.c3d':
-                                xsensnum[entry.name] = '000'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_08' in item][0]+xsensnum[entry.name]
                             elif entry.name == '900_V_pp08_SW01.c3d':
                                 xsensnum[entry.name] = '001'
                                 xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_08' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp08_LT02.c3d':
-                                xsensnum[entry.name] = '003'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_08' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp08_LT03.c3d':
-                                xsensnum[entry.name] = '004'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_08' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp08_LT01.c3d': 
-                                xsensnum[entry.name] = '002'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_08' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp08_STS01.c3d': 
-                                xsensnum[entry.name] = '006'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_08' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp08_STS02.c3d':
-                                xsensnum[entry.name] = '007'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_08' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp08_STS03.c3d':
-                                xsensnum[entry.name] = '008'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_08' in item][0]+xsensnum[entry.name]
                             
-                            elif entry.name == '900_V_pp09_Turn03.c3d':
-                                xsensnum[entry.name] = '001'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_09' in item][0]+xsensnum[entry.name]
                             elif entry.name == '900_V_pp09_SW01.c3d':
                                 xsensnum[entry.name] = '002'
                                 xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_09' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp09_LT01.c3d':
-                                xsensnum[entry.name] = '003'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_09' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp09_LT02.c3d':
-                                xsensnum[entry.name] = '004'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_09' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp09_LT03.c3d': 
-                                xsensnum[entry.name] = '005'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_09' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp09_STS01.c3d':
-                                xsensnum[entry.name] = '006'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_09' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp09_STS03.c3d':
-                                xsensnum[entry.name] = '008'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_09' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp09_STS04.c3d':
-                                xsensnum[entry.name] = '009'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_09' in item][0]+xsensnum[entry.name]
                             
-                            elif entry.name == '900_V_pp10_Turn01.c3d':
-                                xsensnum[entry.name] = '000'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_10' in item][0]+xsensnum[entry.name]
                             elif entry.name == '900_V_pp10_SW01.c3d':
                                 xsensnum[entry.name] = '001'
                                 xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_10' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp10_LT01.c3d': 
-                                xsensnum[entry.name] = '002'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_10' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp10_LT03.c3d':
-                                xsensnum[entry.name] = '004'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_10' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp10_LT04.c3d':
-                                xsensnum[entry.name] = '005'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_10' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp10_STS01.c3d': 
-                                xsensnum[entry.name] = '006'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_10' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp10_STS02.c3d':
-                                xsensnum[entry.name] = '007'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_10' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp10_STS03.c3d':
-                                xsensnum[entry.name] = '008'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_10' in item][0]+xsensnum[entry.name]
                             
-                            elif entry.name == '900_V_pp11_Turn01.c3d':
-                                xsensnum[entry.name] = '000'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_11' in item][0]+xsensnum[entry.name]
                             elif entry.name == '900_V_pp11_SW01.c3d':
                                 xsensnum[entry.name] = '001'
                                 xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_11' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp11_LT01.c3d':
-                                xsensnum[entry.name] = '002'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_11' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp11_LT02.c3d':
-                                xsensnum[entry.name] = '004'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_11' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp11_LT04.c3d':
-                                xsensnum[entry.name] = '006'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_11' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp11_STS02.c3d': 
-                                xsensnum[entry.name] = '008'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_11' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp11_STS03.c3d':
-                                xsensnum[entry.name] = '009'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_11' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp11_STS04.c3d':
-                                xsensnum[entry.name] = '010'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_11' in item][0]+xsensnum[entry.name]
                             
-                            elif entry.name == '900_V_pp12_Turn01.c3d':
-                                xsensnum[entry.name] = '000'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_12' in item][0]+xsensnum[entry.name]
                             elif entry.name == '900_V_pp12_SW01.c3d':
                                 xsensnum[entry.name] = '001'
                                 xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_12' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp12_LT02.c3d':
-                                xsensnum[entry.name] = '003'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_12' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp12_LT03.c3d':
-                                xsensnum[entry.name] = '004'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_12' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp12_LT04.c3d':
-                                xsensnum[entry.name] = '005'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_12' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp12_STS01.c3d':
-                                xsensnum[entry.name] = '006'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_12' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp12_STS02.c3d':
-                                xsensnum[entry.name] = '007'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_12' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp12_STS03.c3d':
-                                xsensnum[entry.name] = '008'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_12' in item][0]+xsensnum[entry.name]
                             
-                            elif entry.name == '900_V_pp13_Turn01.c3d':
-                                xsensnum[entry.name] = '000'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_13' in item][0]+xsensnum[entry.name]
                             elif entry.name == '900_V_pp13_SW01.c3d':
                                 xsensnum[entry.name] = '001'
                                 xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_13' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp13_LT01.c3d':
-                                xsensnum[entry.name] = '002'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_13' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp13_LT02.c3d':
-                                xsensnum[entry.name] = '003'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_13' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp13_LT03.c3d':
-                                xsensnum[entry.name] = '004'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_13' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp13_STS01.c3d': 
-                                xsensnum[entry.name] = '005'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_13' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp13_STS02.c3d':
-                                xsensnum[entry.name] = '006'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_13' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp13_STS04.c3d':
-                                xsensnum[entry.name] = '008'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_13' in item][0]+xsensnum[entry.name]
                             
-                            elif entry.name == '900_V_pp14_Turn02.c3d':
-                                xsensnum[entry.name] = '000'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_14' in item][0]+xsensnum[entry.name]
                             elif entry.name == '900_V_pp14_SW01.c3d':
                                 xsensnum[entry.name] = '001'
                                 xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_14' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp14_LT02.c3d':
-                                xsensnum[entry.name] = '003'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_14' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp14_LT03.c3d':
-                                xsensnum[entry.name] = '004'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_14' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp14_LT04.c3d':
-                                xsensnum[entry.name] = '005'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_14' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp14_STS02.c3d':
-                                xsensnum[entry.name] = '007'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_14' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp14_STS03.c3d':
-                                xsensnum[entry.name] = '008'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_14' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp14_STS04.c3d':
-                                xsensnum[entry.name] = '009'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_14' in item][0]+xsensnum[entry.name]
                             
-                            elif entry.name == '900_V_pp15_Turn01.c3d':
-                                xsensnum[entry.name] = '004'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_15' in item][0]+xsensnum[entry.name]
                             elif entry.name == '900_V_pp15_SW01.c3d':
                                 xsensnum[entry.name] = '006'
                                 xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_15' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp15_LT03.c3d':
-                                xsensnum[entry.name] = '009'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_15' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp15_LT04.c3d':
-                                xsensnum[entry.name] = '010'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_15' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp15_LT05.c3d': # Fixed speed
-                                xsensnum[entry.name] = '011'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_15' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp15_STS01.c3d': # Fixed speed
-                                xsensnum[entry.name] = '012'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_15' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp15_STS02.c3d':
-                                xsensnum[entry.name] = '013'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_15' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp15_STS03.c3d':
-                                xsensnum[entry.name] = '014'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_15' in item][0]+xsensnum[entry.name]
                             
-                            elif entry.name == '900_V_pp16_SP02.c3d': # Turn trial
-                                xsensnum[entry.name] = '001'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_16' in item][0]+xsensnum[entry.name]
                             elif entry.name == '900_V_pp16_SW01.c3d':
                                 xsensnum[entry.name] = '002'
                                 xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_16' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp16_LT01.c3d':
-                                xsensnum[entry.name] = '003'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_16' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp16_LT02.c3d':
-                                xsensnum[entry.name] = '004'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_16' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp16_LT03.c3d':
-                                xsensnum[entry.name] = '005'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_16' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp16_STS01.c3d':
-                                xsensnum[entry.name] = '006'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_16' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp16_STS02.c3d':
-                                xsensnum[entry.name] = '007'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_16' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp16_STS03.c3d':
-                                xsensnum[entry.name] = '008'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_16' in item][0]+xsensnum[entry.name]
                             
-                            elif entry.name == '900_V_pp18_Turn01.c3d':
-                                xsensnum[entry.name] = '004'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_18' in item][0]+xsensnum[entry.name]
                             elif entry.name == '900_V_pp18_SW01.c3d':
                                 xsensnum[entry.name] = '005'
                                 xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_18' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp18_LT02.c3d':
-                                xsensnum[entry.name] = '007'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_18' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp18_LT03.c3d':
-                                xsensnum[entry.name] = '008'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_18' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp18_LT04.c3d': # Fixed speed
-                                xsensnum[entry.name] = '009'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_18' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp18_STS01.c3d': # Fixed speed
-                                xsensnum[entry.name] = '010'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_18' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp18_STS02.c3d':
-                                xsensnum[entry.name] = '011'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_18' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp18_STS03.c3d':
-                                xsensnum[entry.name] = '012'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_18' in item][0]+xsensnum[entry.name]
                             
-                            elif entry.name == '900_V_pp19_Turn01.c3d':
-                                xsensnum[entry.name] = '003'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_19' in item][0]+xsensnum[entry.name]
                             elif entry.name == '900_V_pp19_SW01.c3d':
                                 xsensnum[entry.name] = '004'
                                 xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_19' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp19_LT01.c3d':
-                                xsensnum[entry.name] = '005'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_19' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp19_LT02.c3d':
-                                xsensnum[entry.name] = '006'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_19' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp19_LT03.c3d': # Fixed speed
-                                xsensnum[entry.name] = '007'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_19' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp19_STS01.c3d': # Fixed speed
-                                xsensnum[entry.name] = '008'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_19' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp19_STS02.c3d':
-                                xsensnum[entry.name] = '009'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_19' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp19_STS03.c3d':
-                                xsensnum[entry.name] = '010'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_19' in item][0]+xsensnum[entry.name]
                             
-                            elif entry.name == '900_V_pp20_Turn01.c3d':
-                                xsensnum[entry.name] = '000'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_20' in item][0]+xsensnum[entry.name]
                             elif entry.name == '900_V_pp20_SW01.c3d':
                                 xsensnum[entry.name] = '001'
                                 xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_20' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp20_LT01.c3d':
-                                xsensnum[entry.name] = '002'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_20' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp20_LT03.c3d':
-                                xsensnum[entry.name] = '004'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_20' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp20_LT04.c3d': # Fixed speed
-                                xsensnum[entry.name] = '005'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_20' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp20_STS01.c3d': # Fixed speed
-                                xsensnum[entry.name] = '006'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_20' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp20_STS02.c3d':
-                                xsensnum[entry.name] = '007'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_20' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp20_STS03.c3d':
-                                xsensnum[entry.name] = '008'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_20' in item][0]+xsensnum[entry.name]
                             
-                            elif entry.name == '900_V_pp21_Turn02.c3d':
-                                xsensnum[entry.name] = '001'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_21' in item][0]+xsensnum[entry.name]
                             elif entry.name == '900_V_pp21_SW01.c3d':
                                 xsensnum[entry.name] = '002'
                                 xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_21' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp21_LT01.c3d':
-                                xsensnum[entry.name] = '003'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_21' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp21_LT04.c3d':
-                                xsensnum[entry.name] = '006'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_21' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp21_LT05.c3d': # Fixed speed
-                                xsensnum[entry.name] = '007'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_21' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp21_STS01.c3d': # Fixed speed
-                                xsensnum[entry.name] = '008'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_21' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp21_STS02.c3d':
-                                xsensnum[entry.name] = '009'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_21' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp21_STS03.c3d':
-                                xsensnum[entry.name] = '010'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_21' in item][0]+xsensnum[entry.name]
                             
-                            elif entry.name == '900_V_pp22_Turn01.c3d':
-                                xsensnum[entry.name] = '000'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_22' in item][0]+xsensnum[entry.name]
                             elif entry.name == '900_V_pp22_SW01.c3d':
                                 xsensnum[entry.name] = '001'
                                 xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_22' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp22_LT01.c3d':
-                                xsensnum[entry.name] = '002'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_22' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp22_LT02.c3d':
-                                xsensnum[entry.name] = '003'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_22' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp22_LT03.c3d': # Fixed speed
-                                xsensnum[entry.name] = '004'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_22' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp22_STS01.c3d': # Fixed speed
-                                xsensnum[entry.name] = '005'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_22' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp22_STS02.c3d':
-                                xsensnum[entry.name] = '006'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_22' in item][0]+xsensnum[entry.name]
-                            elif entry.name == '900_V_pp22_STS03.c3d':
-                                xsensnum[entry.name] = '007'
-                                xsensfilepaths[entry.name] = [item for item in ppfoldersxsens if '900_V_22' in item][0]+xsensnum[entry.name]
+                           
             except FileNotFoundError:
                 xsensnum[ppfolders[i]] = 'Unavailable'
                 xsensfilepaths[ppfolders[i]] = 'Unavailable'
@@ -917,11 +510,7 @@ def dataimport(datafolder, trialtype):
     filesSS = dict() # Stepping stones
     filesCal = dict() # Calibration trial
     filesGBA = dict()
-    filesTurn = dict() # Turn in measurement volume
     filesSW = dict() # Straight ahead walking in measurement volume
-    filesL = dict() # L-test
-    filesSTS = dict() # Sit-to-stand transfer
-    
 
     removekeys=[]
     for key in files:
@@ -948,24 +537,12 @@ def dataimport(datafolder, trialtype):
         if 'Cal' in key:
             filesCal[key] = files[key]
         # Overground trials
-        if '_Turn' in key:
-            filesTurn[key] = files[key]
-            filesGBA[key] = files[key]
         if '_SW' in key:
             filesSW[key] = files[key]
             filesGBA[key] = files[key]
-        if '_LT' in key:
-            filesL[key] = files[key]
-            filesGBA[key] = files[key]
-        if '_STS' in key:
-            filesSTS[key] = files[key]
         if '_2MWT' in key:
-            filesTurn[key] = files[key]
             filesSW[key] = files[key]
             filesGBA[key] = files[key]
-        # if '_SP' in key:
-        #     filesTurn[key] = files[key]
-        #     filesGBA[key] = files[key]
     
     # Set trialnames to be analyzed
     trialnames = list()

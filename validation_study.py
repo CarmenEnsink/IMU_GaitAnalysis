@@ -32,7 +32,7 @@ analyze_trialtypes['CVA GRAIL'] = True
 storedfile = True
 
 if storedfile == True:
-    filename = 'validation_study_dataset_testSL3.pkl'
+    filename = 'validation_study_dataset.pkl'
 elif storedfile == False:
     # Define filepaths for vicon and xsens data
     datafolder = os.path.abspath('data')
