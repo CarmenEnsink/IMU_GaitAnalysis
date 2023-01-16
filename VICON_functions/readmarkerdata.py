@@ -3,12 +3,12 @@
 Script to read c3d markerdata
 
 Version:
+    2023-01-10: C.J. Ensink - check if analog data available
     2022-01-20: C.J. Ensink - add analog data
     2022-12-23: Bart Nienhuis
 """
 
 import c3d
-# from VICON_functions import c3d
 import numpy as np
 # import tkinter as tk
 # from tkinter import filedialog
@@ -25,52 +25,55 @@ def readmarkerdata (filepath, **kwargs):
     # definieeer een reader opject welke velden er zijn kun je terug vinden en de c3d.py file
     reader = c3d.Reader(open(filepath, 'rb'))
 
-    #  voorbeeld: lees het aantal analoge frames per marker frame.  Analog sample frequentie is vaak 1000 Hz 
-    #  deze waarde is dat 10 als de marker sample frequentie 100 Hz is  
-    # analog_per_frame=reader.header.analog_per_frame
-    # print(analog_per_frame)
-
+    #  Lees sample frequentie markerdata
+    fs_markerdata = reader.point_rate
+    
     # De marker labels zitten in een apparte groep in de c3D file deze kun uitlezen m.b.v. het point_labels veld 
     # De volgorde van de labels is dezelfde als de volgorde in de markerdata.
     markerlabels=reader.point_labels
-    # print(labels)
     
-    # Check of er anologe data (forceplates) aanwezig is.
-    try:
-        analog_labels = list(reader.analog_labels)
-        # analog_labels=(reader.groups['ANALOG'].params['LABELS'].bytes).decode("utf-8")
-    except (KeyError, AttributeError) as error:
-        analog_labels = list(['None Available'])
+    # Controleer of analoge data (forceplates) beschikbaar is
+    analog_available = reader.analog_used>0
     
-    # Verwijder de hele rij met spaties uit de labelnaam
-    for i in range(0,len(analog_labels)):
-        analog_labels[i] = analog_labels[i].replace(" ","")
-    # analoglabels=[]
+    analog_wanted = False
+    for key, value in kwargs.items():
+        if key == 'analogdata' and value == True:
+            analog_wanted = True
+        elif key == 'analogdata' and value == False:
+            analog_wanted = False
+    
+    # Lees analoge data in
+    analoglabels=[]
+    if analog_wanted == True:
+        if analog_available == True:
+            analog_per_frame=reader.header.analog_per_frame
+            # fs_analogdata = reader.analog_rate
+            # print(fs_analogdata)
+            analoglabels = list(reader.analog_labels)
+        elif analog_available == False:
+            analoglabels = 'None available'
+    
     # dotloc = np.array([],dtype=int)
-    # for label in range(0,len(analog_labels)):
-    #     for char in range(0,len(analog_labels[label])):
-    #         if analog_labels[label][char] == '.':
-    #             dotloc = np.append(dotloc, char)
-        
+    # for char in range(0,len(analog_labels)):
+    #     if analog_labels[char] == '.':
+    #         dotloc = np.append(dotloc, char)
+    
     # for i in range(0,len(dotloc)):
-    #     lastuppercase_beforedot = [idx for idx in range(0,dotloc[i]) if analog_labels[i][idx].isupper()][-1]
-    #     try:
-    #         firstspace_afterdot = [idx for idx in range(dotloc[i],len(analog_labels[i])) if analog_labels[i][idx] == " "][1]
-    #     except IndexError:
-    #         firstspace_afterdot = len(analog_labels[i])
+    #     lastuppercase_beforedot = [idx for idx in range(0,dotloc[i]) if analog_labels[idx].isupper()][-1]
+    #     firstspace_afterdot = [idx for idx in range(dotloc[i],len(analog_labels)) if analog_labels[idx] == " "][0]
         
-    #     # if dotloc[i] < dotloc[-1]:
-    #     #     if firstspace_afterdot > dotloc[i+1]:
-    #     #         firstspace_afterdot = [idx for idx in range(dotloc[i],len(analog_labels[i])) if analog_labels[i][idx].isupper()][1]
+    #     if dotloc[i] < dotloc[-1]:
+    #         if firstspace_afterdot > dotloc[i+1]:
+    #             firstspace_afterdot = [idx for idx in range(dotloc[i],len(analog_labels)) if analog_labels[idx].isupper()][1]
                 
-    #     label = analog_labels[i][lastuppercase_beforedot : firstspace_afterdot]
+    #     label = analog_labels [lastuppercase_beforedot : firstspace_afterdot]
     #     analoglabels.append(label)
 
     # Dit zijn de lists waarin de makerdata en analog_data  worden ingelezen
     markerdata_list=[]
     analog_data_list=[]
     analog_per_frame = reader.header.analog_per_frame
-    analog_count = reader.header.analog_count
+    # analog_count = reader.header.analog_count
 
     for i, points, analog in reader.read_frames():
     #            frames : sequence of (frame number, points, analog)
@@ -94,8 +97,9 @@ def readmarkerdata (filepath, **kwargs):
 
         #  LET OP voor de analoge moet de matrix gereshaped worden en dat hangt af van het aantal analoge kanalen in de C3D file
         try:
-            # analog_data_list.append(analog.reshape(analog_per_frame, int(analog_count/analog_per_frame)))
-            analog_data_list.append(np.transpose(analog))
+            analog_data_list.append(analog.reshape(analog_per_frame, int(reader.analog_used))) #int(analog_count/analog_per_frame)))
+        # analog_data_list.append(analog.reshape(analog_per_frame,36))
+        # analog_data_list.append(analog.reshape(analog_per_frame,42))
         except ZeroDivisionError:
             # print('No analog data available')
             continue
@@ -104,7 +108,6 @@ def readmarkerdata (filepath, **kwargs):
             continue
         
         
-    
     # maak van de twee list numpy array
     marker_data=np.stack(markerdata_list, axis=2)
     try:
@@ -118,30 +121,19 @@ def readmarkerdata (filepath, **kwargs):
             marker_x = marker_data[0,i,:]
             marker_y = marker_data[1,i,:]
             marker_z = marker_data[2,i,:]
-            # vars()[labels[i].split(' ')[0]] = np.transpose(np.array([marker_x, marker_y,marker_z]))
             markerdata[markerlabels[i].split(' ')[0]] = np.transpose(np.array([marker_x, marker_y,marker_z]))
     
     analogdata=dict()
-    try:
-        for i in range(0,len(analog_labels)):
-            analogdata[analog_labels[i]] = analog_data[:,i]
-    except IndexError:
-        analogdata[analog_labels[i]] = np.array([])
+    for i in range(0,len(analoglabels)):
+        analogdata[analoglabels[i]] = analog_data[:,i]
     
-    # ParameterGroup = reader.groups #['EVENT']
-    fs_markerdata = reader.header.frame_rate #100
+    actual_start_frame = reader.first_frame
+    actual_stop_frame = reader.last_frame
     
-    opt = False
-    for key, value in kwargs.items():
-        if key == 'analogdata' and value == True:
-            opt = True
-        elif key == 'analogdata' and value == False:
-            opt = False
-    
-    if opt == True:
-        return markerdata, fs_markerdata, analogdata #ParameterGroup, 
-    elif opt == False:
-        return markerdata, fs_markerdata #ParameterGroup, 
+    if analog_wanted == True:
+        return markerdata, fs_markerdata, analogdata
+    elif analog_wanted == False:
+        return markerdata, fs_markerdata
         
     # fig1 = plt.figure()
     # ax3 = fig1.add_subplot(111, projection='3d') 
