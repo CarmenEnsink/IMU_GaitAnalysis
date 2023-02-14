@@ -97,7 +97,8 @@ def readmarkerdata (filepath, **kwargs):
 
         #  LET OP voor de analoge moet de matrix gereshaped worden en dat hangt af van het aantal analoge kanalen in de C3D file
         try:
-            analog_data_list.append(analog.reshape(analog_per_frame, int(reader.analog_used))) #int(analog_count/analog_per_frame)))
+            analog_data_list.append(analog.T)
+        # analog_data_list.append(analog.reshape(analog_per_frame, int(reader.analog_used))) #int(analog_count/analog_per_frame)))
         # analog_data_list.append(analog.reshape(analog_per_frame,36))
         # analog_data_list.append(analog.reshape(analog_per_frame,42))
         except ZeroDivisionError:
@@ -130,10 +131,7 @@ def readmarkerdata (filepath, **kwargs):
     actual_start_frame = reader.first_frame
     actual_stop_frame = reader.last_frame
     
-    if analog_wanted == True:
-        return markerdata, fs_markerdata, analogdata
-    elif analog_wanted == False:
-        return markerdata, fs_markerdata
+    return markerdata, fs_markerdata, analogdata
         
     # fig1 = plt.figure()
     # ax3 = fig1.add_subplot(111, projection='3d') 
