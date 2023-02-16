@@ -59,6 +59,8 @@ def data_filelist(datafolder):
     
     # Check if there is a file called sensorspec.json
     sensorspecfile = False # default
+    sample_frequency = False # default
+    
     for i in range(0,len(filenames)):
         if 'sensorspec.json' in filenames[i]:
             with open(dirpath+'/'+filenames[i]) as f:
@@ -150,7 +152,8 @@ def data_filelist(datafolder):
                     continue
                                
                 sensorspec[loc] = filenames[i]
-    
+        if loc == 'sample_frequency':
+            sample_frequency = sensorspec[loc]
     
     
     # Define filepaths
@@ -169,7 +172,7 @@ def data_filelist(datafolder):
     else:
         print ('Something went wrong in recognizing the filetypes')
         
-    return filepaths, sensortype
+    return filepaths, sensortype, sample_frequency
     
 
 def getFilePathsFromSensorspec(datafolder, sensorspec):
