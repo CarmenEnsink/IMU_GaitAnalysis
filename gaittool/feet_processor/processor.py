@@ -144,11 +144,14 @@ def test_processor(datafolder, **kwargs):
     showfigure = 'hide'  # 'view'
     
     # Define list of filepaths and sensortype of the datarecordings
-    filepaths, sensortype = data_filelist(datafolder)
+    filepaths, sensortype, sample_frequency = data_filelist(datafolder)
     
     if len(filepaths) > 0:
         # Define data dictionary with all sensordata
-        data = data_preprocessor(filepaths, sensortype, **kwargs)
+        if sample_frequency == False:
+            data = data_preprocessor(filepaths, sensortype)
+        else:
+            data = data_preprocessor(filepaths, sensortype, sample_frequency=sample_frequency)
         
         # Determine trialType based on foldername or kwargs item
         # default is 'Unknown from foldername'
