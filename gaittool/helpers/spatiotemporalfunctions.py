@@ -628,7 +628,8 @@ def turnidentification(data):
                     
             if len(idxturn)<1:
                 # If turn duration > 10 s or turn duration < 0.05 s; eliminate turn
-                if finalcrossing - initialcrossing < 10 * sample_frequency or finalcrossing - initialcrossing > 0.05 * sample_frequency:
+                # if finalcrossing - initialcrossing < 10 * sample_frequency or finalcrossing - initialcrossing > 0.05 * sample_frequency:
+                if (finalcrossing - initialcrossing < (10 * sample_frequency)) and ((finalcrossing - initialcrossing) > (np.nanmean([data['Spatiotemporals']['Step time left (s)'], data['Spatiotemporals']['Step time right (s)']]) * sample_frequency)):    
                     idxturn = np.append(idxturn, np.arange(initialcrossing, finalcrossing+1))
             
             elif len(idxturn)>0:
@@ -638,7 +639,8 @@ def turnidentification(data):
                         idxturn = np.append(idxturn, np.arange(idxturn[-1], finalcrossing+1))
                 else:
                     # If turn duration > 10 s or turn duration < 0.05 s; eliminate turn
-                    if finalcrossing - initialcrossing < 10 * sample_frequency or finalcrossing - initialcrossing > 0.05 * sample_frequency:
+                    # if finalcrossing - initialcrossing < 10 * sample_frequency or finalcrossing - initialcrossing > 0.05 * sample_frequency:
+                    if ((finalcrossing - initialcrossing) < (10 * sample_frequency)) and ((finalcrossing - initialcrossing) > (np.nanmean([data['Spatiotemporals']['Step time left (s)'], data['Spatiotemporals']['Step time right (s)']]) * sample_frequency)):
                         idxturn = np.append(idxturn, np.arange(initialcrossing, finalcrossing+1))
                 
                 # If turn duration > 10 s or turn duration < 0.05 s; eliminate turn
