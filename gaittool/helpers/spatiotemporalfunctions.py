@@ -1141,25 +1141,58 @@ def ststransfers(data, errors):
     # Front. Neurol. 9:652. doi: 10.3389/fneur.2018.00652
     sample_frequency = data['Sample Frequency (Hz)']
     
+    # if 'Sternum' not in data['Missing Sensors']:
+    #     fGYRy = data['Sternum']['derived']['Gyroscope Earth frame'][:,1]
+    #     # tilt = data['Sternum']['raw']['Orientation Euler'][:,1]
+    #     tilt = np.zeros(shape=(len(data['Sternum']['derived']['Gyroscope Earth frame'][:,1]),1))
+    #     for i in range(1,len(tilt)):
+    #         tilt[i,0] = tilt[i-1,0] + (data['Sternum']['derived']['Gyroscope Earth frame'][i,1] * 1/sample_frequency)
+    # elif 'Lumbar' not in data['Missing Sensors']:
+    #     fGYRy = data['Lumbar']['derived']['Gyroscope Earth frame'][:,1]
+    #     # tilt = data['Lumbar']['raw']['Orientation Euler'][:,1]
+    #     tilt = np.zeros(shape=(len(data['Lumbar']['derived']['Gyroscope Earth frame'][:,1]),1))
+    #     for i in range(1,len(tilt)):
+    #         tilt[i,0] = tilt[i-1,0] + (data['Lumbar']['derived']['Gyroscope Earth frame'][i,1] * 1/sample_frequency)
+    
     if 'Sternum' not in data['Missing Sensors']:
-        fGYRy = data['Sternum']['derived']['Gyroscope Earth frame'][:,1]
-        # tilt = data['Sternum']['raw']['Orientation Euler'][:,1]
-        tilt = np.zeros(shape=(len(data['Sternum']['derived']['Gyroscope Earth frame'][:,1]),1))
-        for i in range(1,len(tilt)):
-            tilt[i,0] = tilt[i-1,0] + (data['Sternum']['derived']['Gyroscope Earth frame'][i,1] * 1/sample_frequency)
+        fGYRy = data['Sternum']['raw']['Gyroscope'][:,1]
+        # tilt = np.unwrap(np.deg2rad(data['Sternum']['raw']['Orientation Euler'][:,1]), period=2*np.pi)
+        
+        tilt2 = np.zeros(shape=(len(fGYRy),1))
+        for i in range(1,len(tilt2)):
+            tilt2[i,0] = tilt2[i-1,0] + (fGYRy[i] * 1/sample_frequency)
+        
     elif 'Lumbar' not in data['Missing Sensors']:
-        fGYRy = data['Lumbar']['derived']['Gyroscope Earth frame'][:,1]
-        # tilt = data['Lumbar']['raw']['Orientation Euler'][:,1]
-        tilt = np.zeros(shape=(len(data['Lumbar']['derived']['Gyroscope Earth frame'][:,1]),1))
-        for i in range(1,len(tilt)):
-            tilt[i,0] = tilt[i-1,0] + (data['Lumbar']['derived']['Gyroscope Earth frame'][i,1] * 1/sample_frequency)
+        fGYRy = data['Lumbar']['raw']['Gyroscope'][:,1]
+        # tilt = np.unwrap(np.deg2rad(data['Lumbar']['raw']['Orientation Euler'][:,1]), period=2*np.pi)
+        
+        tilt2 = np.zeros(shape=(len(fGYRy),1))
+        for i in range(1,len(tilt2)):
+            tilt2[i,0] = tilt2[i-1,0] + (fGYRy[i] * 1/sample_frequency)
     
+    # Low pass filter fGYRy
+    fc = 5  # Cut-off frequency of the filter
+    w = fc / (sample_frequency / 2) # Normalize the frequency
+    N = 2 # Order of the butterworth filter
+    filter_type = 'lowpass' # Type of the filter
+    b, a = signal.butter(N, w, filter_type)
+    fGYRy = signal.filtfilt(b, a, fGYRy) # Apply filter on data
+    
+    # Drift removal
+    totaldrift = tilt2[-1] - tilt2[0]
+    tilt = np.zeros((len(tilt2),1))
+    for i in range(0,len(tilt)):
+        tilt[i] = tilt2[i] - (totaldrift/len(tilt2))*float(i)
     tilt = tilt.flatten()
-    
+        
     idxsts=np.array([], dtype = int) # Array of index numbers identified as STS transfer
     
-    idxstspeaks = signal.find_peaks(tilt, prominence= 0.1)[0]
-    
+    if np.mean(np.abs(tilt[signal.find_peaks(tilt, prominence= 0.2)[0]])) >= np.mean(np.abs(tilt[signal.find_peaks(-tilt, prominence= 0.2)[0]])):
+        idxstspeaks = signal.find_peaks(tilt, prominence= 0.2)[0]
+    elif np.mean(np.abs(tilt[signal.find_peaks(tilt, prominence= 0.2)[0]])) < np.mean(np.abs(tilt[signal.find_peaks(-tilt, prominence= 0.2)[0]])):
+        idxstspeaks = signal.find_peaks(-tilt, prominence= 0.2)[0]
+        fGYRy=-fGYRy
+        
     # Find preceding and following 0 deg/s crossings with negative/positive slope 
     # This slope is dependent on the orientation of the sensor, TODO: see if this can be recognized in the data and automatically corrected for
     # crossing = 0
@@ -1291,8 +1324,12 @@ def leanangle(data, showfigure):
                 psi[int(j-(transfers[i,0]-0.2*sample_frequency))]   = np.rad2deg( math.atan2( 2 * (qd.w * qd.z + qd.x * qd.y), 1 - 2 * (qd.y**2 + qd.z**2) ) )
             
             minvalue = np.min(theta)
+            maxvalue = np.max(theta)
             meanvalue = np.mean(theta[0:int(0.2*sample_frequency)])
-            transfers[i,3] = round( np.abs( minvalue - meanvalue ), 1)
+            if np.abs( minvalue - meanvalue ) > np.abs( maxvalue - meanvalue ):
+                transfers[i,3] = round( np.abs( minvalue - meanvalue ), 1)
+            elif np.abs( maxvalue - meanvalue ) > np.abs( minvalue - meanvalue ):
+                transfers[i,3] = round( np.abs( maxvalue - meanvalue ), 1)
         
         elif transfers[i,2] == 1 and transfers[i,0] <= 0.2*sample_frequency: # Sit-to-stand
         
@@ -1312,9 +1349,16 @@ def leanangle(data, showfigure):
                 theta[int(j-transfers[i,0])] = np.rad2deg( math.asin ( 2 * (qd.w * qd.y - qd.z * qd.x) ) )
                 psi[int(j-transfers[i,0])]   = np.rad2deg( math.atan2( 2 * (qd.w * qd.z + qd.x * qd.y), 1 - 2 * (qd.y**2 + qd.z**2) ) )
             
+            # minvalue = np.min(theta)
+            # meanvalue = np.mean(theta[0:int(0.2*sample_frequency)])
+            # transfers[i,3] = round( np.abs( minvalue - meanvalue ), 1)
             minvalue = np.min(theta)
+            maxvalue = np.max(theta)
             meanvalue = np.mean(theta[0:int(0.2*sample_frequency)])
-            transfers[i,3] = round( np.abs( minvalue - meanvalue ), 1)
+            if np.abs( minvalue - meanvalue ) > np.abs( maxvalue - meanvalue ):
+                transfers[i,3] = round( np.abs( minvalue - meanvalue ), 1)
+            elif np.abs( maxvalue - meanvalue ) > np.abs( minvalue - meanvalue ):
+                transfers[i,3] = round( np.abs( maxvalue - meanvalue ), 1)
                 
         elif transfers[i,2] == 2 and transfers[i,1] < (len(data['Sternum']['raw']['Orientation Quaternion'])-0.2*sample_frequency): # Stand-to-sit
             
@@ -1334,9 +1378,16 @@ def leanangle(data, showfigure):
                 theta[int(j-transfers[i,0])] = np.rad2deg( math.asin ( 2 * (qd.w * qd.y - qd.z * qd.x) ) )
                 psi[int(j-transfers[i,0])]   = np.rad2deg( math.atan2( 2 * (qd.w * qd.z + qd.x * qd.y), 1 - 2 * (qd.y**2 + qd.z**2) ) )
             
+            # minvalue = np.min(theta)
+            # meanvalue = np.mean(theta[int(-0.2*sample_frequency):])
+            # transfers[i,3] = round( np.abs( minvalue - meanvalue ), 1)
             minvalue = np.min(theta)
+            maxvalue = np.max(theta)
             meanvalue = np.mean(theta[int(-0.2*sample_frequency):])
-            transfers[i,3] = round( np.abs( minvalue - meanvalue ), 1)
+            if np.abs( minvalue - meanvalue ) > np.abs( maxvalue - meanvalue ):
+                transfers[i,3] = round( np.abs( minvalue - meanvalue ), 1)
+            elif np.abs( maxvalue - meanvalue ) > np.abs( minvalue - meanvalue ):
+                transfers[i,3] = round( np.abs( maxvalue - meanvalue ), 1)
                     
         elif transfers[i,2] == 2 and transfers[i,1] >= 0.2*sample_frequency: # Stand-to-sit
             
@@ -1356,9 +1407,16 @@ def leanangle(data, showfigure):
                 theta[int(j-transfers[i,0])] = np.rad2deg( math.asin ( 2 * (qd.w * qd.y - qd.z * qd.x) ) )
                 psi[int(j-transfers[i,0])]   = np.rad2deg( math.atan2( 2 * (qd.w * qd.z + qd.x * qd.y), 1 - 2 * (qd.y**2 + qd.z**2) ) )
             
+            # minvalue = np.min(theta)
+            # meanvalue = np.mean(theta[int(-0.2*sample_frequency):])
+            # transfers[i,3] = round( np.abs( minvalue - meanvalue ), 1)
             minvalue = np.min(theta)
+            maxvalue = np.max(theta)
             meanvalue = np.mean(theta[int(-0.2*sample_frequency):])
-            transfers[i,3] = round( np.abs( minvalue - meanvalue ), 1)
+            if np.abs( minvalue - meanvalue ) > np.abs( maxvalue - meanvalue ):
+                transfers[i,3] = round( np.abs( minvalue - meanvalue ), 1)
+            elif np.abs( maxvalue - meanvalue ) > np.abs( minvalue - meanvalue ):
+                transfers[i,3] = round( np.abs( maxvalue - meanvalue ), 1)
             
     
     # Determine mean of maximum lean angle per type of tranfer
