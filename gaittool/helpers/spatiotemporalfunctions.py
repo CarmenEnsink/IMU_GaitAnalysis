@@ -1110,7 +1110,7 @@ def gaitspeed(data, errors):
         
     # Return average gait speed in steady state gait based on "Method: No 1 stride around turn"
     try:
-        data['Spatiotemporals']['Gait speed (km/h)'] = round( (np.nanmedian(np.append(data['Left foot']['derived']['Gait speed per stride - no 1 steps around turn (m/s)'][:,2], data['Right foot']['derived']['Gait speed per stride - no 1 steps around turn (m/s)'][:,2]))  *3.6), 2)
+        data['Spatiotemporals']['Gait speed (km/h)'] = round( (np.nanmedian(np.append(data['Left foot']['derived']['Gait speed per stride - no 2 steps around turn (m/s)'][:,2], data['Right foot']['derived']['Gait speed per stride - no 2 steps around turn (m/s)'][:,2]))  *3.6), 2)
     except RuntimeWarning:
         data['Spatiotemporals']['Gait speed (km/h)'] = round( (np.nanmedian(np.append(data['Left foot']['derived']['Gait speed per stride (m/s)'][:,2], data['Right foot']['derived']['Gait speed per stride (m/s)'][:,2])) *3.6), 2)
         errors['No steady state gait'] = True

@@ -152,7 +152,7 @@ def data_filelist(datafolder):
                     continue
                                
                 sensorspec[loc] = filenames[i]
-        if loc == 'sample_frequency':
+        if loc == 'sample_frequency' or loc == 'sample frequency':
             sample_frequency = sensorspec[loc]
     
     
