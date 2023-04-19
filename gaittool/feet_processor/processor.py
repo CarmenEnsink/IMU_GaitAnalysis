@@ -2,7 +2,7 @@ import numpy as np
 import statistics as st
 
 from ..helpers.preprocessor import data_filelist, data_preprocessor
-from ..helpers.spatiotemporalfunctions import walkingsamples, ststransfers, nonactivesamples, stepcount, cadence, swingtime, stancetime, stridetime, steptime, doublesupport, velocity, gaitspeed, turnidentification, turnparameters, positionestimation, stridelength, asymmetry, leanangle, footAngle
+from ..helpers.spatiotemporalfunctions import walkingsamples, ststransfers, nonactivesamples, stepcount, cadence, swingtime, stancetime, stridetime, steptime, doublesupport, velocity, gaitspeed, turnidentification, turnparameters, positionestimation, stridelength, asymmetry, leanangle, trunk_ROM, footAngle
 from .analyzedata import analyzedata
 
 def process(data, showfigure): 
@@ -97,7 +97,7 @@ def process(data, showfigure):
     
     # Stride length
     data = stridelength(data, errors, showfigure)
-    data['Spatiotemporals']['Stride length - average steady state walking (m)'] = round(np.nanmedian(np.sort(np.append(data['Left foot']['derived']['Stride length - no 1 steps around turn (m)'][:,2], data['Right foot']['derived']['Stride length - no 1 steps around turn (m)'][:,2]) )), 2)
+    data['Spatiotemporals']['Stride length - average steady state walking (m)'] = round(np.nanmedian(np.sort(np.append(data['Left foot']['derived']['Stride length - no 2 steps around turn (m)'][:,2], data['Right foot']['derived']['Stride length - no 2 steps around turn (m)'][:,2]) )), 2)
     data['Spatiotemporals']['Stride length - average all strides (m)'] = round(((data['Left foot']['derived']['Stride length - average all strides (m)'] + data['Right foot']['derived']['Stride length - average all strides (m)'])/2),2)
 
     # # Stride time
@@ -121,6 +121,10 @@ def process(data, showfigure):
     # Lean angle
     if 'Sternum' not in data['Missing Sensors'] and (data['trialType'] == 'L-test' or data['trialType'] == 'STS-transfer'):
         data = leanangle(data, showfigure)
+    
+    # Trunk coronal range of motion
+    if 'Sternum' not in data['Missing Sensors']:
+        data = trunk_ROM(data)
     
     # Check if sample frequency makes sense based on output:
     if errors['No walking period'] == False:

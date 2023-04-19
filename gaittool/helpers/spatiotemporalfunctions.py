@@ -1436,26 +1436,125 @@ def leanangle(data, showfigure):
 
 
 
-def lateroflexion(data, showfigure):
-    # INPUT:  sensor data
-    # OUTPUT: lateroflexion (deg) per stride
+def trunk_ROM(data):
+    # from scipy import signal
     
-    def functionlateroflexion(indexInitialContact, sternumEulerX):
-        maxlateroflexion = np.array([])
-        for i in range(0, len(indexInitialContact)-1):
-            maxlateroflexion = np.append(maxlateroflexion, round(np.max(np.abs(data['Sternum']['raw']['Orientation Euler'][:,0])[indexInitialContact[i]:indexInitialContact[i+1]])), 1) # assumed sensor is aligned with sternum!
-            
-        return maxlateroflexion
-
-    sides = ['left', 'right']
-    for i in range(0, len(sides)):
-        if sides[i] == 'left':
-            data['Sternum']['derived']['Lateroflexion left strides'] = functionlateroflexion(data['Left foot']['Gait Events']['Initial Contact'], data['Sternum']['raw']['Orientation Euler'][:,0])
-        elif sides[i] == 'right':
-            data['Sternum']['derived']['Lateroflexion right strides'] = functionlateroflexion(data['Right foot']['Gait Events']['Initial Contact'], data['Sternum']['raw']['Orientation Euler'][:,0])
+    # sample_frequency = data['Sample Frequency (Hz)']
+    
+    if 'Sternum' not in data['Missing Sensors']:
+        GYRz = data['Sternum']['raw']['Gyroscope'][:,2]
+        euler = data['Sternum']['raw']['Orientation Euler'][:,0]
         
+    elif 'Lumbar' not in data['Missing Sensors']:
+        GYRz = data['Lumbar']['raw']['Gyroscope'][:,2]
+        euler = data['Lumbar']['raw']['Orientation Euler'][:,0]
+    
+    # Correct gimbal lock
+    idxdifs = np.argwhere(np.diff(euler)>300)
+    idxdifs = np.sort(np.append(idxdifs, np.argwhere(np.diff(euler)<-300)))
+    for i in np.arange(start=0, stop=len(idxdifs)-1, step=1):
+        # if np.min(euler[idxdifs[i]:idxdifs[i+1]]) > 50:
+        euler[idxdifs[i]:idxdifs[i+1]] = -1*(euler[idxdifs[i]:idxdifs[i+1]]) - np.diff([euler[idxdifs[i]], -1*euler[idxdifs[i]]])
+        
+    if 'Lumbar' not in data['Missing Sensors']:
+        idx_turn = data['Lumbar']['derived']['Change in Walking Direction samples']
+    elif 'Sternum' not in data['Missing Sensors']:
+        idx_turn = data['Sternum']['derived']['Change in Walking Direction samples']
+        
+    idx_straight = np.arange(0,len(GYRz))
+    idx_straight = idx_straight[~np.isin(idx_straight, idx_turn)]
+    
+    if len(idx_turn) > 0:
+        diffturnidx = np.diff(idx_turn)
+        newturnstart = np.array([idx_turn[0]], dtype = int)
+        newendturn = np.array([idx_turn[-1]], dtype = int)
+        for i in range(0,len(diffturnidx)):
+            if diffturnidx[i] > 1:
+                newturnstart = np.append(newturnstart, idx_turn[i+1])
+                newendturn = np.append(newendturn, idx_turn[i])
+        newendturn = np.sort(newendturn)
+
+    idx_steadystate = idx_straight
+    TC = np.sort(np.append(data['Left foot']['derived']['Stride length - no 2 steps around turn (m)'][:,0], data['Right foot']['derived']['Stride length - no 2 steps around turn (m)'][:,0]))
+    IC = np.sort(np.append(data['Left foot']['derived']['Stride length - no 2 steps around turn (m)'][:,1], data['Right foot']['derived']['Stride length - no 2 steps around turn (m)'][:,1]))
+    for i in range(0, len(newturnstart)):
+        try:
+            initiationphase = np.arange(newendturn[i], TC[TC>newendturn[i]][0])
+        except IndexError:
+            initiationphase = np.array([])
+        idx_steadystate = idx_steadystate[~np.isin(idx_steadystate, initiationphase)]
+    for i in range(0, len(newturnstart)):
+        try:
+            terminationphase = np.arange(IC[IC<newturnstart[i]][-1], newturnstart[i])
+        except IndexError:
+            terminationphase = np.array([])
+        idx_steadystate = idx_steadystate[~np.isin(idx_steadystate, terminationphase)]
+    
+    try:
+        initialinitiation = np.arange(0, TC[0])
+    except IndexError:
+        initialinitiation = np.array([])
+    try:
+        lasttermination = np.arange(IC[-1], len(GYRz))
+    except IndexError:
+        lasttermination = np.array([])
+    idx_steadystate = idx_steadystate[~np.isin(idx_steadystate, initialinitiation)]
+    idx_steadystate = idx_steadystate[~np.isin(idx_steadystate, lasttermination)]
+    
+    rom_per_stride = np.zeros((len(IC),1))
+    for i in range(0,len(IC)-1):
+        idxstride = np.arange(IC[i], IC[i+1])
+        if np.all(np.isin(idxstride, idx_steadystate)):
+            rom_per_stride[i] = np.max(euler[idxstride.astype(int)]) - np.min(euler[idxstride.astype(int)])
+    
+    rom_per_stride = rom_per_stride[rom_per_stride>0] # Rejection in case of gimbal lock
+    rom_per_stride = rom_per_stride[rom_per_stride<180] # Rejection in case of gimbal lock
+    trunkROM = np.nanmean(rom_per_stride)
+    # trunkROM = np.max(euler[idx_steadystate]) - np.min(euler[idx_steadystate])
+    
+    data['Lumbar']['derived']['Steady-state walking samples'] = idx_steadystate.astype(int)
+    data['Spatiotemporals']['Trunk range of motion (deg)'] = np.round(trunkROM, 1)
+    # # Low pass filter fGYRy
+    # fc = 5  # Cut-off frequency of the filter
+    # w = fc / (sample_frequency / 2) # Normalize the frequency
+    # N = 2 # Order of the butterworth filter
+    # filter_type = 'lowpass' # Type of the filter
+    # b, a = signal.butter(N, w, filter_type)
+    # GYRz = signal.filtfilt(b, a, GYRz) # Apply filter on data
+    
     return data
 
+
+
+def relative_orientation(sensorRelative, sensorFixed, relative_to):
+    import pyquaternion as pyq
+    import math
+    # sensorRelative should include the orientation of the sensor relative to the orientation of another sensor over time.
+    # sensorFixed should include the orientation of the sensor to which another sensor's orientation should be calculated over time.
+    
+    quat_sensorRelative = sensorRelative['raw']['Orientation Quaternion']
+    quat_sensorFixed = sensorFixed['raw']['Orientation Quaternion']
+    
+    phi = np.zeros((len(quat_sensorRelative), 1))
+    theta = np.zeros((len(quat_sensorRelative), 1))
+    psi = np.zeros((len(quat_sensorRelative), 1))
+    
+    for j in range(len(quat_sensorFixed)):
+        q_fixed = pyq.Quaternion( quat_sensorFixed[j,:] )
+        q_relative = pyq.Quaternion( quat_sensorRelative[j,:] )
+        
+        # Get the 3D difference between these two orientations
+        qd = q_relative * q_fixed.conjugate
+        qd = qd.normalised
+    
+        # Calculate Euler angles from this difference quaternion
+        phi[j]   = np.rad2deg( math.atan2( 2 * (qd.w * qd.x + qd.y * qd.z), 1 - 2 * (qd.x**2 + qd.y**2) ) )
+        theta[j] = np.rad2deg( math.asin ( 2 * (qd.w * qd.y - qd.z * qd.x) ) )
+        psi[j]   = np.rad2deg( math.atan2( 2 * (qd.w * qd.z + qd.x * qd.y), 1 - 2 * (qd.y**2 + qd.z**2) ) )
+    
+    sensorRelative['derived']['Orientation relative to '+relative_to] = np.array([phi.flatten(), theta.flatten(), psi.flatten()]).T
+        
+    return sensorRelative
 
 
 
