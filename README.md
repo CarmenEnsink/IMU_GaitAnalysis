@@ -9,6 +9,7 @@ The folder "gaittool" contains functions to import, preprocess and process the d
 The folder "VICON_functions" contains functions to analyze the optical motion capture data.
 
 Explanation of the code and the order of running the code is commented through the scripts.
+Explanation of the data is provided in the ReadMe file in the folder "data".
 
 In case you are only interested in the gait analysis pipeline, only the code in the folder "gaittool" is of importance.
 The "gaittool" folder contains functions to import, preprocess and process IMU data, and can be run with the following commands:
