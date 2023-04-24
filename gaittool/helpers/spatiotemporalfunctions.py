@@ -1437,25 +1437,20 @@ def leanangle(data, showfigure):
 
 
 def trunk_ROM(data):
-    # from scipy import signal
+    from scipy import signal
     
-    # sample_frequency = data['Sample Frequency (Hz)']
+    sample_frequency = data['Sample Frequency (Hz)']
     
     if 'Sternum' not in data['Missing Sensors']:
         GYRz = data['Sternum']['raw']['Gyroscope'][:,2]
-        euler = data['Sternum']['raw']['Orientation Euler'][:,0]
+        eulerX = data['Sternum']['raw']['Orientation Euler'][:,0]
+        eulerZ = data['Sternum']['raw']['Orientation Euler'][:,2]
         
     elif 'Lumbar' not in data['Missing Sensors']:
         GYRz = data['Lumbar']['raw']['Gyroscope'][:,2]
-        euler = data['Lumbar']['raw']['Orientation Euler'][:,0]
+        eulerX = data['Lumbar']['raw']['Orientation Euler'][:,0]
+        eulerZ = data['Lumbar']['raw']['Orientation Euler'][:,2]
     
-    # Correct gimbal lock
-    idxdifs = np.argwhere(np.diff(euler)>300)
-    idxdifs = np.sort(np.append(idxdifs, np.argwhere(np.diff(euler)<-300)))
-    for i in np.arange(start=0, stop=len(idxdifs)-1, step=1):
-        # if np.min(euler[idxdifs[i]:idxdifs[i+1]]) > 50:
-        euler[idxdifs[i]:idxdifs[i+1]] = -1*(euler[idxdifs[i]:idxdifs[i+1]]) - np.diff([euler[idxdifs[i]], -1*euler[idxdifs[i]]])
-        
     if 'Lumbar' not in data['Missing Sensors']:
         idx_turn = data['Lumbar']['derived']['Change in Walking Direction samples']
     elif 'Sternum' not in data['Missing Sensors']:
@@ -1501,19 +1496,38 @@ def trunk_ROM(data):
     idx_steadystate = idx_steadystate[~np.isin(idx_steadystate, initialinitiation)]
     idx_steadystate = idx_steadystate[~np.isin(idx_steadystate, lasttermination)]
     
-    rom_per_stride = np.zeros((len(IC),1))
+    # Correct gimbal lock
+    idxdifs = np.argwhere(np.diff(eulerX)>300)
+    idxdifs = np.sort(np.append(idxdifs, np.argwhere(np.diff(eulerX)<-300)))
+    for i in np.arange(start=0, stop=len(idxdifs)-1, step=1):
+        # if np.min(euler[idxdifs[i]:idxdifs[i+1]]) > 50:
+        eulerX[idxdifs[i]:idxdifs[i+1]] = -1*(eulerX[idxdifs[i]:idxdifs[i+1]]) - np.diff([eulerX[idxdifs[i]], -1*eulerX[idxdifs[i]]])
+    idxdifs = np.argwhere(np.diff(eulerZ)>300)
+    idxdifs = np.sort(np.append(idxdifs, np.argwhere(np.diff(eulerZ)<-300)))
+    for i in np.arange(start=0, stop=len(idxdifs)-1, step=1):
+        # if np.min(euler[idxdifs[i]:idxdifs[i+1]]) > 50:
+        eulerZ[idxdifs[i]:idxdifs[i+1]] = -1*(eulerZ[idxdifs[i]:idxdifs[i+1]]) - np.diff([eulerZ[idxdifs[i]], -1*eulerZ[idxdifs[i]]])
+    
+    rom_per_strideX = np.zeros((len(IC),1))
+    rom_per_strideZ = np.zeros((len(IC),1))
     for i in range(0,len(IC)-1):
         idxstride = np.arange(IC[i], IC[i+1])
-        if np.all(np.isin(idxstride, idx_steadystate)):
-            rom_per_stride[i] = np.max(euler[idxstride.astype(int)]) - np.min(euler[idxstride.astype(int)])
-    
-    rom_per_stride = rom_per_stride[rom_per_stride>0] # Rejection in case of gimbal lock
-    rom_per_stride = rom_per_stride[rom_per_stride<180] # Rejection in case of gimbal lock
-    trunkROM = np.nanmean(rom_per_stride)
+        if np.all(np.isin(idxstride, idx_steadystate)) and ((IC[i+1] - IC[i]) < 150*data['Spatiotemporals']['Stride time left (s)']):
+            rom_per_strideX[i] = np.max(eulerX[idxstride.astype(int)]) - np.min(eulerX[idxstride.astype(int)])
+            rom_per_strideZ[i] = np.max(eulerZ[idxstride.astype(int)]) - np.min(eulerZ[idxstride.astype(int)])
+    rom_per_strideX = rom_per_strideX[rom_per_strideX>0] # Rejection in case of gimbal lock
+    rom_per_strideX = rom_per_strideX[rom_per_strideX<180] # Rejection in case of gimbal lock
+    trunkROMX = np.nanmean(rom_per_strideX)            
+    rom_per_strideZ = rom_per_strideZ[rom_per_strideZ>0] # Rejection in case of gimbal lock
+    rom_per_strideZ = rom_per_strideZ[rom_per_strideZ<180] # Rejection in case of gimbal lock
+    trunkROMZ = np.nanmean(rom_per_strideZ)
     # trunkROM = np.max(euler[idx_steadystate]) - np.min(euler[idx_steadystate])
     
     data['Lumbar']['derived']['Steady-state walking samples'] = idx_steadystate.astype(int)
-    data['Spatiotemporals']['Trunk range of motion (deg)'] = np.round(trunkROM, 1)
+    data['Sternum']['derived']['RoM per steady-state stride X'] = rom_per_strideX
+    data['Spatiotemporals']['Trunk transverse range of motion (deg)'] = np.round(trunkROMX, 1)
+    data['Sternum']['derived']['RoM per steady-state stride Z'] = rom_per_strideZ
+    data['Spatiotemporals']['Trunk coronal range of motion (deg)'] = np.round(trunkROMZ, 1)
     # # Low pass filter fGYRy
     # fc = 5  # Cut-off frequency of the filter
     # w = fc / (sample_frequency / 2) # Normalize the frequency
