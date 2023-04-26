@@ -2,7 +2,7 @@ Gait analysis with inertial measurement units
 
 ** PUBLICATION OF THIS VALIDATION WILL FOLLOW **
 
-*Version of the code used in this publication can be found in the **Validation study** release, updates from the Sint Maartenskliniek research team will be done from time to time in the main branch.*
+*Version of the code used in this publication can be found in the **Validation study** release.*
  
  
  
