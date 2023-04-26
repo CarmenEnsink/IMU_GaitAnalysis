@@ -104,10 +104,10 @@ def data_filelist(datafolder):
                     print('Sensor files recognized as "Awinda", assign default sensor specifications...')
                     sensorspec = dict()
                     sensorspec['leftfoot'] = '00B40AC5.txt'
-                    sensorspec['leftlateralankle'] = '00B40ACF.txt'
+                    sensorspec['leftshank'] = '00B40ACF.txt' #leftlateralankle
                     sensorspec['lumbar'] = '00B40A8D.txt'
                     sensorspec['rightfoot'] = '00B40A23.txt'
-                    sensorspec['rightlateralankle'] ='00B40AC7.txt'
+                    sensorspec['rightshank'] ='00B40AC7.txt' #rightlateralankle
                     sensorspec['sternum'] = '00B40A40.txt'
                 # Check if first file is .csv file > Assumed Xsens DOT, find filenames that contain either 'Linkervoet' or 'Rechtervoet'
                 elif filenames[0].endswith('.csv'):
@@ -170,7 +170,7 @@ def data_filelist(datafolder):
             filepaths = [datafolder + '/' + rawdir + '/' + file]
             filepaths = [i for i in filepaths if 'remove' not in i]
     else:
-        print ('Something went wrong in recognizing the filetypes')
+        print('Something went wrong in recognizing the filetypes')
         
     return filepaths, sensortype, sample_frequency
     
@@ -186,6 +186,16 @@ def getFilePathsFromSensorspec(datafolder, sensorspec):
         filepaths['RightFoot'] = datafolder + '/' + sensorspec['rightfoot']
     except:
         filepaths['RightFoot'] = []
+
+    try:
+        filepaths['LeftShank'] = datafolder + '/' + sensorspec['leftshank']
+    except:
+        filepaths['LeftShank'] = []
+
+    try:
+        filepaths['RightShank'] = datafolder + '/' + sensorspec['rightshank']
+    except:
+        filepaths['RightShank'] = []
 
     try:
         filepaths['Lumbar'] = datafolder + '/' + sensorspec['lumbar']
@@ -221,6 +231,16 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
             dataright = pd.DataFrame(columns=(['PacketCounter', 'SampleTimeFine', 'Quat_W', 'Quat_X', 'Quat_Y', 'Quat_Z', 'dq_W', 'dq_X', 'dq_Y', 'dq_Z', 'dv[1]', 'dv[2]', 'dv[3]', 'Mag_X', 'Mag_y', 'Mag_Z', 'Status']))
         
         try:
+            dataleftshank = pd.read_csv(filepaths['LeftShank'], delimiter=',', engine='python', skiprows = 11)
+        except ValueError:
+            dataleftshank = pd.DataFrame(columns=(['PacketCounter', 'SampleTimeFine', 'Quat_W', 'Quat_X', 'Quat_Y', 'Quat_Z', 'dq_W', 'dq_X', 'dq_Y', 'dq_Z', 'dv[1]', 'dv[2]', 'dv[3]', 'Mag_X', 'Mag_y', 'Mag_Z', 'Status']))
+
+        try:
+            datarightshank = pd.read_csv(filepaths['RightShank'], delimiter=',', engine='python', skiprows = 11)
+        except ValueError:
+            datarightshank = pd.DataFrame(columns=(['PacketCounter', 'SampleTimeFine', 'Quat_W', 'Quat_X', 'Quat_Y', 'Quat_Z', 'dq_W', 'dq_X', 'dq_Y', 'dq_Z', 'dv[1]', 'dv[2]', 'dv[3]', 'Mag_X', 'Mag_y', 'Mag_Z', 'Status']))
+
+        try:
             datalumbar = pd.read_csv(filepaths['Lumbar'], delimiter=',', engine='python', skiprows = 11)
         except ValueError:
             datalumbar = pd.DataFrame(columns=(['PacketCounter', 'SampleTimeFine', 'Quat_W', 'Quat_X', 'Quat_Y', 'Quat_Z', 'dq_W', 'dq_X', 'dq_Y', 'dq_Z', 'dv[1]', 'dv[2]', 'dv[3]', 'Mag_X', 'Mag_y', 'Mag_Z', 'Status']))
@@ -239,6 +259,12 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
         if len(dataright) == 0:
             print('No right foot data available')
             missingsensors.append('RightFoot')
+        if len(dataleftshank) == 0:
+            print('No left shank data available')
+            missingsensors.append('LeftShank')
+        if len(datarightshank) == 0:
+            print('No right shank data available')
+            missingsensors.append('RightShank')
         if len(datalumbar) == 0:
             print('No lumbar data available')
             missingsensors.append('Lumbar')
@@ -249,6 +275,14 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
         # Make all data frames the same length
         lenleft = max(dataleft['PacketCounter'])
         lenright = max(dataright['PacketCounter'])
+        if 'LeftShank' not in missingsensors:
+            lenleftshank = max(dataleftshank['PacketCounter'])
+        else:
+            lenleftshank = max(lenleft,lenright)*2
+        if 'RightShank' not in missingsensors:
+            lenrightshank = max(datarightshank['PacketCounter'])
+        else:
+            lenrightshank = max(lenleft, lenright) * 2
         if 'Lumbar' not in missingsensors:
             lenlumbar = max(datalumbar['PacketCounter'])
         else:
@@ -258,7 +292,7 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
         else:
             lensternum = max(lenleft,lenright)*2
         
-        datalens = [lenleft,lenright,lenlumbar,lensternum]
+        datalens = [lenleft,lenright,lenleftshank,lenrightshank,lenlumbar,lensternum]
         minlen = min(datalens)
         index_minlen = min(range(len(datalens)), key=datalens.__getitem__)
         
@@ -267,8 +301,12 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
         elif index_minlen == 1:
             lastsample = np.where(dataright['PacketCounter']==lenright)[0][0]
         elif index_minlen == 2:
-            lastsample = np.where(datalumbar['PacketCounter']==lenlumbar)[0][0]
+            lastsample = np.where(dataleftshank['PacketCounter'] == lenleftshank)[0][0]
         elif index_minlen == 3:
+            lastsample = np.where(datarightshank['PacketCounter'] == lenrightshank)[0][0]
+        elif index_minlen == 4:
+            lastsample = np.where(datalumbar['PacketCounter']==lenlumbar)[0][0]
+        elif index_minlen == 5:
             lastsample = np.where(datasternum['PacketCounter']==lensternum)[0][0]
         
         if (len(dataleft)-1)-lastsample == 1:
@@ -279,6 +317,14 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
             dataright = dataright.drop(lastsample+1)
         else:
             dataright = dataright.drop(range(lastsample+1, len(dataright)-1))
+        if (len(dataleftshank)-1)-lastsample == 1:
+            dataleftshank = dataleftshank.drop(lastsample+1)
+        else:
+            dataleftshank = dataleftshank.drop(range(lastsample+1, len(dataleftshank)-1))
+        if (len(datarightshank)-1)-lastsample == 1:
+            datarightshank = datarightshank.drop(lastsample+1)
+        else:
+            datarightshank = datarightshank.drop(range(lastsample+1, len(datarightshank)-1))
         if (len(datalumbar)-1)-lastsample == 1:
             datalumbar = datalumbar.drop(lastsample+1)
         else:
@@ -295,6 +341,10 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
             packets = pd.concat([packets, dataleft['PacketCounter']])
         if 'RightFoot' not in missingsensors:
             packets = pd.concat([packets, dataright['PacketCounter']])
+        if 'LeftShank' not in missingsensors:
+            packets = pd.concat([packets, dataleftshank['PacketCounter']])
+        if 'RightShank' not in missingsensors:
+            packets = pd.concat([packets, datarightshank['PacketCounter']])
         if 'Lumbar' not in missingsensors:
             packets = pd.concat([packets, datalumbar['PacketCounter']])
         if 'Sternum' not in missingsensors:
@@ -330,6 +380,8 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
         # Remove missing packets
         dataleft = dataleft[~dataleft['PacketCounter'].isin(missingpackets)]
         dataright = dataright[~dataright['PacketCounter'].isin(missingpackets)]
+        dataleftshank = dataleftshank[~dataleftshank['PacketCounter'].isin(missingpackets)]
+        datarightshank = datarightshank[~datarightshank['PacketCounter'].isin(missingpackets)]
         datalumbar = datalumbar[~datalumbar['PacketCounter'].isin(missingpackets)]
         datasternum = datasternum[~datasternum['PacketCounter'].isin(missingpackets)]
         
@@ -347,6 +399,20 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
         ACCSFright = calcCalAcc((dataright.filter(['dv[1]','dv[2]','dv[3]'])).to_numpy(), sample_frequency)
         MAGright = (dataright.filter(['Mag_X','Mag_Y','Mag_Z'])).to_numpy()
         ACCEFright = calcFreeAcc(quaternionorientationright, ACCSFright)
+
+        quaternionorientationleftshank = (dataleftshank.filter(['Quat_W','Quat_X','Quat_Y','Quat_Z'])).to_numpy()
+        eulerorientationleftshank = eulFromQuat(quaternionorientationleftshank)
+        GYRleftshank = calcCalGyr((dataleftshank.filter(['dq_W','dq_X','dq_Y','dq_Z'])).to_numpy(), sample_frequency)
+        ACCSFleftshank = calcCalAcc((dataleftshank.filter(['dv[1]','dv[2]','dv[3]'])).to_numpy(), sample_frequency)
+        MAGleftshank = (dataleftshank.filter(['Mag_X','Mag_Y','Mag_Z'])).to_numpy()
+        ACCEFleftshank = calcFreeAcc(quaternionorientationleftshank, ACCSFleft)
+
+        quaternionorientationrightshank = (datarightshank.filter(['Quat_W','Quat_X','Quat_Y','Quat_Z'])).to_numpy()
+        eulerorientationrightshank = eulFromQuat(quaternionorientationrightshank)
+        GYRrightshank = calcCalGyr((datarightshank.filter(['dq_W','dq_X','dq_Y','dq_Z'])).to_numpy(), sample_frequency)
+        ACCSFrightshank = calcCalAcc((datarightshank.filter(['dv[1]','dv[2]','dv[3]'])).to_numpy(), sample_frequency)
+        MAGrightshank = (datarightshank.filter(['Mag_X','Mag_Y','Mag_Z'])).to_numpy()
+        ACCEFrightshank = calcFreeAcc(quaternionorientationrightshank, ACCSFright)
         
         quaternionorientationlumbar = (datalumbar.filter(['Quat_W','Quat_X','Quat_Y','Quat_Z'])).to_numpy()
         eulerorientationlumbar = eulFromQuat(quaternionorientationlumbar)
@@ -387,6 +453,16 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
             dataright = pd.DataFrame(columns=(['PacketCounter', 'SampleTimeFine', 'Acc_X', 'Acc_Y', 'Acc_Z', 'FreeAcc_E', 'FreeAcc_N', 'FreeAcc_U', 'Gyr_X', 'Gyr_Y', 'Gyr_Z',
                                               'Mag_X', 'Mag_Y', 'Mag_Z', 'VelInc_X', 'VelInc_Y', 'VelInc_Z', 'Quat_q0', 'Quat_q1', 'Quat_q2', 'Quat_q3', 'Roll', 'Pitch', 'Yaw']))
         try:
+            dataleftshank = pd.read_csv(filepaths['LeftShank'], delimiter='\t', engine='python', skiprows = 12)
+        except ValueError:
+            dataleftshank = pd.DataFrame(columns=(['PacketCounter', 'SampleTimeFine', 'Acc_X', 'Acc_Y', 'Acc_Z', 'FreeAcc_E', 'FreeAcc_N', 'FreeAcc_U', 'Gyr_X', 'Gyr_Y', 'Gyr_Z',
+                                              'Mag_X', 'Mag_Y', 'Mag_Z', 'VelInc_X', 'VelInc_Y', 'VelInc_Z', 'Quat_q0', 'Quat_q1', 'Quat_q2', 'Quat_q3', 'Roll', 'Pitch', 'Yaw']))
+        try:
+            datarightshank = pd.read_csv(filepaths['RightShank'], delimiter='\t', engine='python', skiprows = 12)
+        except ValueError:
+            datarightshank = pd.DataFrame(columns=(['PacketCounter', 'SampleTimeFine', 'Acc_X', 'Acc_Y', 'Acc_Z', 'FreeAcc_E', 'FreeAcc_N', 'FreeAcc_U', 'Gyr_X', 'Gyr_Y', 'Gyr_Z',
+                                              'Mag_X', 'Mag_Y', 'Mag_Z', 'VelInc_X', 'VelInc_Y', 'VelInc_Z', 'Quat_q0', 'Quat_q1', 'Quat_q2', 'Quat_q3', 'Roll', 'Pitch', 'Yaw']))
+        try:
             datalumbar = pd.read_csv(filepaths['Lumbar'], delimiter='\t', engine='python', skiprows = 12)
         except ValueError:
             datalumbar = pd.DataFrame(columns=(['PacketCounter', 'SampleTimeFine', 'Acc_X', 'Acc_Y', 'Acc_Z', 'FreeAcc_E', 'FreeAcc_N', 'FreeAcc_U', 'Gyr_X', 'Gyr_Y', 'Gyr_Z',
@@ -411,6 +487,12 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
         if len(dataright) == 0:
             print('No right foot data available')
             missingsensors.append('RightFoot')
+        if len(dataleftshank) == 0:
+            print('No left shank data available')
+            missingsensors.append('LeftShank')
+        if len(datarightshank) == 0:
+            print('No right shank data available')
+            missingsensors.append('RightShank')
         if len(datalumbar) == 0:
             print('No lumbar data available')
             missingsensors.append('Lumbar')
@@ -426,6 +508,10 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
             packets = pd.concat([packets, dataleft['PacketCounter']])
         if 'RightFoot' not in missingsensors:
             packets = pd.concat([packets, dataright['PacketCounter']])
+        if 'LeftShank' not in missingsensors:
+            packets = pd.concat([packets, dataleftshank['PacketCounter']])
+        if 'RightShank' not in missingsensors:
+            packets = pd.concat([packets, datarightshank['PacketCounter']])
         if 'Lumbar' not in missingsensors:
             packets = pd.concat([packets, datalumbar['PacketCounter']])
         if 'Sternum' not in missingsensors:
@@ -453,6 +539,8 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
         # Remove missing packets
         dataleft = dataleft[~dataleft['PacketCounter'].isin(missingpackets)]
         dataright = dataright[~dataright['PacketCounter'].isin(missingpackets)]
+        dataleftshank = dataleftshank[~dataleftshank['PacketCounter'].isin(missingpackets)]
+        datarightshank = datarightshank[~datarightshank['PacketCounter'].isin(missingpackets)]
         datalumbar = datalumbar[~datalumbar['PacketCounter'].isin(missingpackets)]
         datasternum = datasternum[~datasternum['PacketCounter'].isin(missingpackets)]
         
@@ -470,6 +558,20 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
         ACCSFright = (dataright.filter(['Acc_X','Acc_Y','Acc_Z'])).to_numpy()
         GYRright = (dataright.filter(['Gyr_X','Gyr_Y','Gyr_Z'])).to_numpy()
         MAGright = (dataright.filter(['Mag_X','Mag_Y','Mag_Z'])).to_numpy()
+
+        ACCEFleftshank = (dataleftshank.filter(['FreeAcc_E', 'FreeAcc_N', 'FreeAcc_U'])).to_numpy()
+        quaternionorientationleftshank = (dataleftshank.filter(['Quat_q0', 'Quat_q1', 'Quat_q2', 'Quat_q3'])).to_numpy()
+        eulerorientationleftshank = (dataleftshank.filter(['Roll', 'Pitch', 'Yaw'])).to_numpy()
+        ACCSFleftshank = (dataleftshank.filter(['Acc_X', 'Acc_Y', 'Acc_Z'])).to_numpy()
+        GYRleftshank = (dataleftshank.filter(['Gyr_X', 'Gyr_Y', 'Gyr_Z'])).to_numpy()
+        MAGleftshank = (dataleftshank.filter(['Mag_X', 'Mag_Y', 'Mag_Z'])).to_numpy()
+
+        ACCEFrightshank = (datarightshank.filter(['FreeAcc_E', 'FreeAcc_N', 'FreeAcc_U'])).to_numpy()
+        quaternionorientationrightshank = (datarightshank.filter(['Quat_q0', 'Quat_q1', 'Quat_q2', 'Quat_q3'])).to_numpy()
+        eulerorientationrightshank = (datarightshank.filter(['Roll', 'Pitch', 'Yaw'])).to_numpy()
+        ACCSFrightshank = (datarightshank.filter(['Acc_X', 'Acc_Y', 'Acc_Z'])).to_numpy()
+        GYRrightshank = (datarightshank.filter(['Gyr_X', 'Gyr_Y', 'Gyr_Z'])).to_numpy()
+        MAGrightshank = (datarightshank.filter(['Mag_X', 'Mag_Y', 'Mag_Z'])).to_numpy()
         
         ACCEFlumbar = (datalumbar.filter(['FreeAcc_E','FreeAcc_N','FreeAcc_U'])).to_numpy()
         quaternionorientationlumbar = (datalumbar.filter(['Quat_q0','Quat_q1','Quat_q2','Quat_q3'])).to_numpy()
@@ -502,6 +604,8 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
             
             dataleft = data['Left foot']
             dataright = data['Right foot']
+            dataleftshank = data['Left shank']
+            datarightshank = data['Right shank']
             datalumbar = data['Lumbar']
             datasternum = data['Sternum']
         elif sensortype == 'apdm_homemonitoring':
@@ -518,6 +622,18 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
                 dataright = dataSensor[list(dataSensor.keys())[0]]
             except:
                 dataright = []
+
+            try:
+                dataSensor = h5_reader(filepaths['LeftShank'])
+                dataleftshank = dataSensor[list(dataSensor.keys())[0]]
+            except:
+                dataleftshank = []
+
+            try:
+                dataSensor = h5_reader(filepaths['RightShank'])
+                datarightshank = dataSensor[list(dataSensor.keys())[0]]
+            except:
+                datarightshank = []
             
             try:
                 dataSensor = h5_reader(filepaths['Lumbar'])
@@ -543,6 +659,12 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
         if len(dataright) == 0:
             print('No right foot data available')
             missingsensors.append('RightFoot')
+        if len(dataleftshank) == 0:
+            print('No left shank data available')
+            missingsensors.append('LeftShank')
+        if len(datarightshank) == 0:
+            print('No right shank data available')
+            missingsensors.append('RightShank')
         if len(datalumbar) == 0:
             print('No lumbar data available')
             missingsensors.append('Lumbar')
@@ -552,10 +674,12 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
             
             
         # sync data (based on offset in Time!)
-        syncFailed, intLeft, intRight, intLumbar, intSternum, timestamp, sample_frequency = syncData('apdm', dataleft, dataright, datalumbar, datasternum)
+        syncFailed, intLeft, intRight, intLeftShank, intRightShank, intLumbar, intSternum, timestamp, sample_frequency = syncData('apdm', dataleft, dataright, dataleftshank, datarightshank, datalumbar, datasternum)
         # Define sensordata
         ACCSFleft, GYRleft, MAGleft, ACCEFleft, quaternionorientationleft, eulerorientationleft = extractApdmData(dataleft, intLeft)
         ACCSFright, GYRright, MAGright, ACCEFright, quaternionorientationright, eulerorientationright = extractApdmData(dataright, intRight)
+        ACCSFleftshank, GYRleftshank, MAGleftshank, ACCEFleftshank, quaternionorientationleftshank, eulerorientationleftshank = extractApdmData(dataleftshank, intLeftShank)
+        ACCSFrightshank, GYRrightshank, MAGrightshank, ACCEFrightshank, quaternionorientationrightshank, eulerorientationrightshank = extractApdmData(datarightshank, intRightShank)
         ACCSFlumbar, GYRlumbar, MAGlumbar, ACCEFlumbar, quaternionorientationlumbar, eulerorientationlumbar = extractApdmData(datalumbar, intLumbar)
         ACCSFsternum, GYRsternum, MAGsternum, ACCEFsternum, quaternionorientationsternum, eulerorientationsternum = extractApdmData(datasternum, intSternum)
         
@@ -566,6 +690,12 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
         ACCSFright = staticRotation(ACCSFright)
         GYRright = staticRotation(GYRright)
         MAGright = staticRotation(MAGright)
+        ACCSFleftshank = staticRotation(ACCSFleftshank)
+        GYRleftshank = staticRotation(GYRleftshank)
+        MAGleftshank = staticRotation(MAGleftshank)
+        ACCSFrightshank = staticRotation(ACCSFrightshank)
+        GYRrightshank = staticRotation(GYRrightshank)
+        MAGrightshank = staticRotation(MAGrightshank)
         ACCSFlumbar = staticRotation(ACCSFlumbar)
         GYRlumbar = staticRotation(GYRlumbar)
         MAGlumbar = staticRotation(MAGlumbar)
@@ -591,6 +721,22 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
             dataright = []
             
         try:
+            dataleftshank = pd.read_csv(filepaths['LeftShank'], low_memory=False, skiprows=[1],
+                                   dtype={('Time', 'Gyro X', 'Gyro Y', 'Gyro Z', 'Accel X', 'Accel Y', 'Accel Z',
+                                           'Mag X', 'Mag Y', 'Mag Z', 'Quat W', 'Quat X', 'Quat Y',
+                                           'Quat Z'): np.float64})  # whole file = skiprows=[*range(0,5),6]
+        except:
+            dataleftshank = []
+
+        try:
+            datarightshank = pd.read_csv(filepaths['RightShank'], low_memory=False, skiprows=[1],
+                                    dtype={('Time', 'Gyro X', 'Gyro Y', 'Gyro Z', 'Accel X', 'Accel Y', 'Accel Z',
+                                            'Mag X', 'Mag Y', 'Mag Z', 'Quat W', 'Quat X', 'Quat Y',
+                                            'Quat Z'): np.float64})  # whole file = skiprows=[*range(0,5),6]
+        except:
+            datarightshank = []
+
+        try:
             datalumbar = pd.read_csv(filepaths['Lumbar'],low_memory=False,skiprows=[1],dtype = {('Time', 'Gyro X', 'Gyro Y', 'Gyro Z', 'Accel X', 'Accel Y', 'Accel Z',
                   'Mag X', 'Mag Y', 'Mag Z', 'Quat W', 'Quat X', 'Quat Y', 'Quat Z'): np.float64})#whole file = skiprows=[*range(0,5),6]
         except:
@@ -610,6 +756,12 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
         if len(dataright) == 0:
             print('No right foot data available')
             missingsensors.append('RightFoot')
+        if len(dataleftshank) == 0:
+            print('No left shank data available')
+            missingsensors.append('LeftShank')
+        if len(datarightshank) == 0:
+            print('No right shank data available')
+            missingsensors.append('RightShank')
         if len(datalumbar) == 0:
             print('No lumbar data available')
             missingsensors.append('Lumbar')
@@ -655,12 +807,14 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
         # datalumbar = datalumbar[~datalumbar['PacketCounter'].isin(missingpackets)]
         # datasternum = datasternum[~datasternum['PacketCounter'].isin(missingpackets)]
         # sync data (based on offset in Time!)
-        syncFailed, intLeft, intRight, intLumbar, intSternum, timestamp, sample_frequency = syncData('gaitup', dataleft, dataright, datalumbar, datasternum)
+        syncFailed, intLeft, intRight, intLeftShank, intRightShank, intLumbar, intSternum, timestamp, sample_frequency = syncData('gaitup', dataleft, dataright, dataleftshank, datarightshank, datalumbar, datasternum)
         # print('Elapsed for preprocessing (sync indices sensors) : %s' % (time.time() - t))
 
         # Define sensordata
         ACCSFleft, GYRleft, MAGleft, ACCEFleft, quaternionorientationleft, eulerorientationleft = extractGaitupData(dataleft, intLeft)
         ACCSFright, GYRright, MAGright, ACCEFright, quaternionorientationright, eulerorientationright = extractGaitupData(dataright, intRight)
+        ACCSFleftshank, GYRleftshank, MAGleftshank, ACCEFleftshank, quaternionorientationleftshank, eulerorientationleftshank = extractGaitupData(dataleftshank, intLeftShank)
+        ACCSFrightshank, GYRrightshank, MAGrightshank, ACCEFrightshank, quaternionorientationrightshank, eulerorientationrightshank = extractGaitupData(datarightshank, intRightShank)
         ACCSFlumbar, GYRlumbar, MAGlumbar, ACCEFlumbar, quaternionorientationlumbar, eulerorientationlumbar = extractGaitupData(datalumbar, intLumbar)
         ACCSFsternum, GYRsternum, MAGsternum, ACCEFsternum, quaternionorientationsternum, eulerorientationsternum = extractGaitupData(datasternum, intSternum)
 
@@ -675,6 +829,16 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
         ACCEFright = staticRotation(ACCEFright)
         GYRright = staticRotation(GYRright)
         MAGright = staticRotation(MAGright)
+        ACCSFleftshank = staticRotation(ACCSFleftshank)
+        eulerorientationleftshank = staticRotation(eulerorientationleftshank)
+        ACCEFleftshank = staticRotation(ACCEFleftshank)
+        GYRleftshank = staticRotation(GYRleftshank)
+        MAGleftshank = staticRotation(MAGleftshank)
+        ACCSFrightshank = staticRotation(ACCSFrightshank)
+        eulerorientationrightshank = staticRotation(eulerorientationrightshank)
+        ACCEFrightshank = staticRotation(ACCEFrightshank)
+        GYRrightshank = staticRotation(GYRrightshank)
+        MAGrightshank = staticRotation(MAGrightshank)
         ACCSFlumbar = staticRotation(ACCSFlumbar)
         eulerorientationlumbar = staticRotation(eulerorientationlumbar)
         ACCEFlumbar = staticRotation(ACCEFlumbar)
@@ -694,6 +858,8 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
     data['Missing Sensors'] = missingsensors
     data['Timestamp'] = timestamp
     data['Sample Frequency (Hz)'] = sample_frequency
+
+    # Left Foot
     data['Left foot'] = dict()
     data['Left foot']['raw'] = dict()
     data['Left foot']['raw']['Accelerometer Earth Frame'] = ACCEFleft
@@ -708,7 +874,7 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
     # else:
     data['Left foot']['derived']['Gyroscope Earth frame'] = gyrearthframe(GYRleft, quaternionorientationleft,
                                                                               sample_frequency)
-
+    # Right Foot
     data['Right foot'] = dict()
     data['Right foot']['raw'] = dict()
     data['Right foot']['raw']['Accelerometer Earth Frame'] = ACCEFright
@@ -723,7 +889,31 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
     # else:
     data['Right foot']['derived']['Gyroscope Earth frame'] = gyrearthframe(GYRright, quaternionorientationright,
                                                                                sample_frequency)
-
+    # Left Shank
+    data['Left shank'] = dict()
+    data['Left shank']['raw'] = dict()
+    data['Left shank']['raw']['Accelerometer Earth Frame'] = ACCEFleftshank
+    data['Left shank']['raw']['Orientation Quaternion'] = quaternionorientationleftshank
+    data['Left shank']['raw']['Orientation Euler'] = eulerorientationleftshank
+    data['Left shank']['raw']['Accelerometer Sensor Frame'] = ACCSFleftshank
+    data['Left shank']['raw']['Gyroscope'] = GYRleftshank
+    data['Left shank']['raw']['Magnetometer'] = MAGleftshank
+    data['Left shank']['derived'] = dict()
+    data['Left shank']['derived']['Gyroscope Earth frame'] = gyrearthframe(GYRleftshank, quaternionorientationleftshank,
+                                                                          sample_frequency)
+    # Right Shank
+    data['Right shank'] = dict()
+    data['Right shank']['raw'] = dict()
+    data['Right shank']['raw']['Accelerometer Earth Frame'] = ACCEFrightshank
+    data['Right shank']['raw']['Orientation Quaternion'] = quaternionorientationrightshank
+    data['Right shank']['raw']['Orientation Euler'] = eulerorientationrightshank
+    data['Right shank']['raw']['Accelerometer Sensor Frame'] = ACCSFrightshank
+    data['Right shank']['raw']['Gyroscope'] = GYRrightshank
+    data['Right shank']['raw']['Magnetometer'] = MAGrightshank
+    data['Right shank']['derived'] = dict()
+    data['Right shank']['derived']['Gyroscope Earth frame'] = gyrearthframe(GYRrightshank, quaternionorientationrightshank,
+                                                                           sample_frequency)
+    # Lumbar
     data['Lumbar'] = dict()
     data['Lumbar']['raw'] = dict()
     data['Lumbar']['raw']['Accelerometer Earth Frame'] = ACCEFlumbar
@@ -738,7 +928,7 @@ def data_preprocessor(filepaths, sensortype, **kwargs):
     # else:
     data['Lumbar']['derived']['Gyroscope Earth frame'] = gyrearthframe(GYRlumbar, quaternionorientationlumbar,
                                                                            sample_frequency)
-
+    # Sternum
     data['Sternum'] = dict()
     data['Sternum']['raw'] = dict()
     data['Sternum']['raw']['Accelerometer Earth Frame'] = ACCEFsternum
@@ -921,7 +1111,7 @@ def extractGaitupData(gaitupData, intSync):
 def syncData(sensor_type, dataleft, dataright, datalumbar, datasternum):
     
     syncFailed = False
-    intLeft = intRight = intLumbar = intSternum = tVec = []
+    intLeft = intRight = intLeftShank = intRightShank = intLumbar = intSternum = tVec = []
     sample_frequency = 0
 
     tStart = []
@@ -950,6 +1140,28 @@ def syncData(sensor_type, dataleft, dataright, datalumbar, datasternum):
     else:
         # Copy left for dummy data
         tRight = tLeft
+
+    if len(dataleftshank) > 0:
+        if sensor_type == 'gaitup':
+            tLeftShank = np.array(np.squeeze(dataleftshank[['Time']]))
+        elif sensor_type == 'apdm':
+            tLeftShank = dataleftshank['Time']
+        tStart.append(tLeftShank[0])
+        tEnd.append(tLeftShank[-1])
+    else:
+        # Copy left for dummy data
+        tLeftShank = tLeft
+
+    if len(datarightshank) > 0:
+        if sensor_type == 'gaitup':
+            tRightShank = np.array(np.squeeze(datarightshank[['Time']]))
+        elif sensor_type == 'apdm':
+            tRightShank = datarightshank['Time']
+        tStart.append(tRightShank[0])
+        tEnd.append(tRightShank[-1])
+    else:
+        # Copy left for dummy data
+        tRightShank = tLeft
         
     if len(datalumbar) > 0:
         if sensor_type == 'gaitup':
@@ -984,6 +1196,10 @@ def syncData(sensor_type, dataleft, dataright, datalumbar, datasternum):
         iLeftEnd = np.flatnonzero(tLeft <= tEndMin)[-1]
         iRightStart = np.flatnonzero(tRight >= tStartMax)[0]
         iRightEnd = np.flatnonzero(tRight <= tEndMin)[-1]
+        iLeftShankStart = np.flatnonzero(tLeftShank >= tStartMax)[0]
+        iLeftShankEnd = np.flatnonzero(tLeftShank <= tEndMin)[-1]
+        iRightShankStart = np.flatnonzero(tRightShank >= tStartMax)[0]
+        iRightShankEnd = np.flatnonzero(tRightShank <= tEndMin)[-1]
         iLumbarStart = np.flatnonzero(tLumbar >= tStartMax)[0]
         iLumbarEnd = np.flatnonzero(tLumbar <= tEndMin)[-1]
         iSternumStart = np.flatnonzero(tSternum >= tStartMax)[0]
@@ -991,13 +1207,17 @@ def syncData(sensor_type, dataleft, dataright, datalumbar, datasternum):
 
         intLeft = range(iLeftStart, iLeftEnd)
         intRight = range(iRightStart, iRightEnd)
+        intLeftShank = range(iLeftShankStart, iLeftShankEnd)
+        intRightShank = range(iRightShankStart, iRightShankEnd)
         intLumbar = range(iLumbarStart, iLumbarEnd)
         intSternum = range(iSternumStart, iSternumEnd)
         
         # Cut to same length
-        nSamples = min([len(intLeft), len(intRight), len(intLumbar), len(intSternum)])
+        nSamples = min([len(intLeft), len(intRight), len(intLeftShank), len(intRightShank), len(intLumbar), len(intSternum)])
         intLeft = intLeft[0:nSamples]
         intRight = intRight[0:nSamples]
+        intLeftShank = intLeftShank[0:nSamples]
+        intRightShank = intRightShank[0:nSamples]
         intLumbar = intLumbar[0:nSamples]
         intSternum = intSternum[0:nSamples]
         
@@ -1006,6 +1226,10 @@ def syncData(sensor_type, dataleft, dataright, datalumbar, datasternum):
             intLeft = []
         if len(dataright) == 0:
             intRight = []
+        if len(dataleftshank) == 0:
+            intLeftShank = []
+        if len(datarightshank) == 0:
+            intRightShank = []
         if len(datalumbar) == 0:
             intLumbar = []
         if len(datasternum) == 0:
@@ -1021,5 +1245,4 @@ def syncData(sensor_type, dataleft, dataright, datalumbar, datasternum):
         if sensor_type == 'gaitup':
             sample_frequency = 128
         
-    return syncFailed, intLeft, intRight, intLumbar, intSternum, tVec, sample_frequency
-
+    return syncFailed, intLeft, intRight, intLeftShank, intRightShank, intLumbar, intSternum, tVec, sample_frequency
