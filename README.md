@@ -2,6 +2,10 @@ Gait analysis with inertial measurement units
 
 ** PUBLICATION OF THIS VALIDATION WILL FOLLOW **
 
+*Version of the code used in this publication can be found in the **Validation study** release, updates from the Sint Maartenskliniek research team will be done from time to time in the main branch.*
+ 
+ 
+ 
 Run the **validation_study.py** code to analyze the spatiotemporal parameters of the gait data used in this study.
 - The folder **data** contains the data used in this study.
 - The folder **functions_validationstudy** contains the functions the main script requires to run the validation and import all data in a structured way.
