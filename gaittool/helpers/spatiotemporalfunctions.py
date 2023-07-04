@@ -72,10 +72,10 @@ def nonactivesamples(data):
     #
     # Assumed is that a person is non-active when sample is not identified as walking.
     
-    gyroscopedata = data['Left foot']['raw']['Gyroscope']
+    length = np.min( [len(data['Left foot']['raw']['Gyroscope']), len(data['Right foot']['raw']['Gyroscope'])])
     indexWalkingPeriods = data['Left foot']['Gait Phases']['Walking samples']
     
-    locidx = np.ones((len(gyroscopedata)), dtype='int64')
+    locidx = np.ones((length), dtype='int64')
     for i in range(0,len(indexWalkingPeriods)):
         locidx[indexWalkingPeriods[i]] = 0
     
@@ -1468,7 +1468,10 @@ def trunk_ROM(data):
                 newturnstart = np.append(newturnstart, idx_turn[i+1])
                 newendturn = np.append(newendturn, idx_turn[i])
         newendturn = np.sort(newendturn)
-
+    else:
+        newturnstart = np.array([], dtype = int)
+        newendturn = np.array([], dtype = int)
+    
     idx_steadystate = idx_straight
     TC = np.sort(np.append(data['Left foot']['derived']['Stride length - no 2 steps around turn (m)'][:,0], data['Right foot']['derived']['Stride length - no 2 steps around turn (m)'][:,0]))
     IC = np.sort(np.append(data['Left foot']['derived']['Stride length - no 2 steps around turn (m)'][:,1], data['Right foot']['derived']['Stride length - no 2 steps around turn (m)'][:,1]))
