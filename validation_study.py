@@ -281,6 +281,76 @@ for parameter in mean_IMU['Healthy']['Regular']:
     bland_altman_plot_spatiotemporals_4(variability_IMU['Healthy']['Regular'][parameter], variability_OMCS['Healthy']['Regular'][parameter], variability_IMU['Healthy']['Irregular'][parameter], variability_OMCS['Healthy']['Irregular'][parameter], variability_IMU['Stroke']['Regular'][parameter], variability_OMCS['Stroke']['Regular'][parameter], variability_IMU['Stroke']['Irregular'][parameter], variability_OMCS['Stroke']['Irregular'][parameter], eventType = str(parameter), unit='')
 
 
+# meancovimuHR=dict()
+# meancovomcsHR=dict()
+# meancovimuHI=dict()
+# meancovomcsHI=dict()
+# meancovimuSR=dict()
+# meancovomcsSR=dict()
+# meancovimuSI=dict()
+# meancovomcsSI=dict()
+# sdcovimuHR=dict()
+# sdcovomcsHR=dict()
+# sdcovimuHI=dict()
+# sdcovomcsHI=dict()
+# sdcovimuSR=dict()
+# sdcovomcsSR=dict()
+# sdcovimuSI=dict()
+# sdcovomcsSI=dict()
+# meanmimuHR=dict()
+# meanmomcsHR=dict()
+# meanmimuHI=dict()
+# meanmomcsHI=dict()
+# meanmimuSR=dict()
+# meanmomcsSR=dict()
+# meanmimuSI=dict()
+# meanmomcsSI=dict()
+# sdmimuHR=dict()
+# sdmomcsHR=dict()
+# sdmimuHI=dict()
+# sdmomcsHI=dict()
+# sdmimuSR=dict()
+# sdmomcsSR=dict()
+# sdmimuSI=dict()
+# sdmomcsSI=dict()
+# for parameter in mean_IMU['Healthy']['Regular']:
+#     meancovimuHR[parameter] = np.nanmean(variability_IMU['Healthy']['Regular'][parameter])
+#     meancovomcsHR[parameter] = np.nanmean(variability_OMCS['Healthy']['Regular'][parameter])
+#     meancovimuHI[parameter] = np.nanmean(variability_IMU['Healthy']['Irregular'][parameter])
+#     meancovomcsHI[parameter] = np.nanmean(variability_OMCS['Healthy']['Irregular'][parameter])
+#     meancovimuSR[parameter] = np.nanmean(variability_IMU['Stroke']['Regular'][parameter])
+#     meancovomcsSR[parameter] = np.nanmean(variability_OMCS['Stroke']['Regular'][parameter])
+#     meancovimuSI[parameter] = np.nanmean(variability_IMU['Stroke']['Irregular'][parameter])
+#     meancovomcsSI[parameter] = np.nanmean(variability_OMCS['Stroke']['Irregular'][parameter])
+# for parameter in mean_IMU['Healthy']['Regular']:
+#     sdcovimuHR[parameter] = np.nanstd(variability_IMU['Healthy']['Regular'][parameter])
+#     sdcovomcsHR[parameter] = np.nanstd(variability_OMCS['Healthy']['Regular'][parameter])
+#     sdcovimuHI[parameter] = np.nanstd(variability_IMU['Healthy']['Irregular'][parameter])
+#     sdcovomcsHI[parameter] = np.nanstd(variability_OMCS['Healthy']['Irregular'][parameter])
+#     sdcovimuSR[parameter] = np.nanstd(variability_IMU['Stroke']['Regular'][parameter])
+#     sdcovomcsSR[parameter] = np.nanstd(variability_OMCS['Stroke']['Regular'][parameter])
+#     sdcovimuSI[parameter] = np.nanstd(variability_IMU['Stroke']['Irregular'][parameter])
+#     sdcovomcsSI[parameter] = np.nanstd(variability_OMCS['Stroke']['Irregular'][parameter])
+# for parameter in mean_IMU['Healthy']['Regular']:
+#     meanmimuHR[parameter] = np.nanmean(mean_IMU['Healthy']['Regular'][parameter])
+#     meanmomcsHR[parameter] = np.nanmean(mean_OMCS['Healthy']['Regular'][parameter])
+#     meanmimuHI[parameter] = np.nanmean(mean_IMU['Healthy']['Irregular'][parameter])
+#     meanmomcsHI[parameter] = np.nanmean(mean_OMCS['Healthy']['Irregular'][parameter])
+#     meanmimuSR[parameter] = np.nanmean(mean_IMU['Stroke']['Regular'][parameter])
+#     meanmomcsSR[parameter] = np.nanmean(mean_OMCS['Stroke']['Regular'][parameter])
+#     meanmimuSI[parameter] = np.nanmean(mean_IMU['Stroke']['Irregular'][parameter])
+#     meanmomcsSI[parameter] = np.nanmean(mean_OMCS['Stroke']['Irregular'][parameter])
+# for parameter in mean_IMU['Healthy']['Regular']:
+#     sdmimuHR[parameter] = np.nanstd(mean_IMU['Healthy']['Regular'][parameter])
+#     sdmomcsHR[parameter] = np.nanstd(mean_OMCS['Healthy']['Regular'][parameter])
+#     sdmimuHI[parameter] = np.nanstd(mean_IMU['Healthy']['Irregular'][parameter])
+#     sdmomcsHI[parameter] = np.nanstd(mean_OMCS['Healthy']['Irregular'][parameter])
+#     sdmimuSR[parameter] = np.nanstd(mean_IMU['Stroke']['Regular'][parameter])
+#     sdmomcsSR[parameter] = np.nanstd(mean_OMCS['Stroke']['Regular'][parameter])
+#     sdmimuSI[parameter] = np.nanstd(mean_IMU['Stroke']['Irregular'][parameter])
+#     sdmomcsSI[parameter] = np.nanstd(mean_OMCS['Stroke']['Irregular'][parameter])
+
+# Table 2:
 meancovimuHR=dict()
 meancovomcsHR=dict()
 meancovimuHI=dict()
@@ -289,14 +359,14 @@ meancovimuSR=dict()
 meancovomcsSR=dict()
 meancovimuSI=dict()
 meancovomcsSI=dict()
-sdcovimuHR=dict()
-sdcovomcsHR=dict()
-sdcovimuHI=dict()
-sdcovomcsHI=dict()
-sdcovimuSR=dict()
-sdcovomcsSR=dict()
-sdcovimuSI=dict()
-sdcovomcsSI=dict()
+iqrcovimuHR=dict()
+iqrcovomcsHR=dict()
+iqrcovimuHI=dict()
+iqrcovomcsHI=dict()
+iqrcovimuSR=dict()
+iqrcovomcsSR=dict()
+iqrcovimuSI=dict()
+iqrcovomcsSI=dict()
 meanmimuHR=dict()
 meanmomcsHR=dict()
 meanmimuHI=dict()
@@ -305,14 +375,14 @@ meanmimuSR=dict()
 meanmomcsSR=dict()
 meanmimuSI=dict()
 meanmomcsSI=dict()
-sdmimuHR=dict()
-sdmomcsHR=dict()
-sdmimuHI=dict()
-sdmomcsHI=dict()
-sdmimuSR=dict()
-sdmomcsSR=dict()
-sdmimuSI=dict()
-sdmomcsSI=dict()
+iqrmimuHR=dict()
+iqrmomcsHR=dict()
+iqrmimuHI=dict()
+iqrmomcsHI=dict()
+iqrmimuSR=dict()
+iqrmomcsSR=dict()
+iqrmimuSI=dict()
+iqrmomcsSI=dict()
 for parameter in mean_IMU['Healthy']['Regular']:
     meancovimuHR[parameter] = np.nanmean(variability_IMU['Healthy']['Regular'][parameter])
     meancovomcsHR[parameter] = np.nanmean(variability_OMCS['Healthy']['Regular'][parameter])
@@ -323,14 +393,14 @@ for parameter in mean_IMU['Healthy']['Regular']:
     meancovimuSI[parameter] = np.nanmean(variability_IMU['Stroke']['Irregular'][parameter])
     meancovomcsSI[parameter] = np.nanmean(variability_OMCS['Stroke']['Irregular'][parameter])
 for parameter in mean_IMU['Healthy']['Regular']:
-    sdcovimuHR[parameter] = np.nanstd(variability_IMU['Healthy']['Regular'][parameter])
-    sdcovomcsHR[parameter] = np.nanstd(variability_OMCS['Healthy']['Regular'][parameter])
-    sdcovimuHI[parameter] = np.nanstd(variability_IMU['Healthy']['Irregular'][parameter])
-    sdcovomcsHI[parameter] = np.nanstd(variability_OMCS['Healthy']['Irregular'][parameter])
-    sdcovimuSR[parameter] = np.nanstd(variability_IMU['Stroke']['Regular'][parameter])
-    sdcovomcsSR[parameter] = np.nanstd(variability_OMCS['Stroke']['Regular'][parameter])
-    sdcovimuSI[parameter] = np.nanstd(variability_IMU['Stroke']['Irregular'][parameter])
-    sdcovomcsSI[parameter] = np.nanstd(variability_OMCS['Stroke']['Irregular'][parameter])
+    iqrcovimuHR[parameter] = stats.iqr(variability_IMU['Healthy']['Regular'][parameter])
+    iqrcovomcsHR[parameter] = stats.iqr(variability_OMCS['Healthy']['Regular'][parameter])
+    iqrcovimuHI[parameter] = stats.iqr(variability_IMU['Healthy']['Irregular'][parameter])
+    iqrcovomcsHI[parameter] = stats.iqr(variability_OMCS['Healthy']['Irregular'][parameter])
+    iqrcovimuSR[parameter] = stats.iqr(variability_IMU['Stroke']['Regular'][parameter])
+    iqrcovomcsSR[parameter] = stats.iqr(variability_OMCS['Stroke']['Regular'][parameter])
+    iqrcovimuSI[parameter] = stats.iqr(variability_IMU['Stroke']['Irregular'][parameter])
+    iqrcovomcsSI[parameter] = stats.iqr(variability_OMCS['Stroke']['Irregular'][parameter])
 for parameter in mean_IMU['Healthy']['Regular']:
     meanmimuHR[parameter] = np.nanmean(mean_IMU['Healthy']['Regular'][parameter])
     meanmomcsHR[parameter] = np.nanmean(mean_OMCS['Healthy']['Regular'][parameter])
@@ -341,15 +411,16 @@ for parameter in mean_IMU['Healthy']['Regular']:
     meanmimuSI[parameter] = np.nanmean(mean_IMU['Stroke']['Irregular'][parameter])
     meanmomcsSI[parameter] = np.nanmean(mean_OMCS['Stroke']['Irregular'][parameter])
 for parameter in mean_IMU['Healthy']['Regular']:
-    sdmimuHR[parameter] = np.nanstd(mean_IMU['Healthy']['Regular'][parameter])
-    sdmomcsHR[parameter] = np.nanstd(mean_OMCS['Healthy']['Regular'][parameter])
-    sdmimuHI[parameter] = np.nanstd(mean_IMU['Healthy']['Irregular'][parameter])
-    sdmomcsHI[parameter] = np.nanstd(mean_OMCS['Healthy']['Irregular'][parameter])
-    sdmimuSR[parameter] = np.nanstd(mean_IMU['Stroke']['Regular'][parameter])
-    sdmomcsSR[parameter] = np.nanstd(mean_OMCS['Stroke']['Regular'][parameter])
-    sdmimuSI[parameter] = np.nanstd(mean_IMU['Stroke']['Irregular'][parameter])
-    sdmomcsSI[parameter] = np.nanstd(mean_OMCS['Stroke']['Irregular'][parameter])
-    
+    iqrmimuHR[parameter] = stats.iqr(mean_IMU['Healthy']['Regular'][parameter])
+    iqrmomcsHR[parameter] = stats.iqr(mean_OMCS['Healthy']['Regular'][parameter])
+    iqrmimuHI[parameter] = stats.iqr(mean_IMU['Healthy']['Irregular'][parameter])
+    iqrmomcsHI[parameter] = stats.iqr(mean_OMCS['Healthy']['Irregular'][parameter])
+    iqrmimuSR[parameter] = stats.iqr(mean_IMU['Stroke']['Regular'][parameter])
+    iqrmomcsSR[parameter] = stats.iqr(mean_OMCS['Stroke']['Regular'][parameter])
+    iqrmimuSI[parameter] = stats.iqr(mean_IMU['Stroke']['Irregular'][parameter])
+    iqrmomcsSI[parameter] = stats.iqr(mean_OMCS['Stroke']['Irregular'][parameter])
+
+
 # Length and weights of participants
 heightsHealthy = np.array([168, 164,  166,  165,  183,  173,  168,  179, 186, 181,  180,  180,  170,  162,  166,  182, 174, 180,  179,  176])
 weightsHealthy = np.array([72,  74.8, 76.8, 67.8, 77.2, 62.4, 63.6, 69,  93,  77.6, 78.2, 88.6, 68.4, 66.2, 70.4, 77,  70,  76.8, 89.2, 73.4])
@@ -376,42 +447,62 @@ print('Mann-Whitney_U test for differences between weight of the groups: ', stat
 print('Mann-Whitney_U test for differences between age of the groups: ', stats.mannwhitneyu(agesHealthy, agesStroke))
 print('Chi-square test for differences between genderdistribution of the groups: ', stats.chisquare(f_obs=genderHealthy/20, f_exp=genderStroke/10))
 
-# Uncomment this part if you wish to save an .xls file for further statistical analysis in R.
-R_formatted_data = pd.DataFrame(columns=(['SubjectID', 'Trialtype', 'StrideNr', 'Stride time sensor', 'Stride length sensor', 'Stride velocity sensor', 'Stride time OMCS', 'Stride length OMCS', 'Stride velocity OMCS']))
-for trial in SbS_IMU['Stride length (m)']:
-    if trial in files['GRAIL healthy regular']:
-        trialtype = 'GRAIL healthy regular'
-    elif trial in files['GRAIL healthy irregular']:
-        trialtype = 'GRAIL healthy irregular'
-    elif trial in files['GRAIL stroke regular']:
-        trialtype = 'GRAIL stroke regular'
-    elif trial in files['GRAIL stroke irregular']:
-        trialtype = 'GRAIL stroke irregular'
-    elif trial in files['Overground']:
-        trialtype = 'Overground'
-        
-    for i in range(0, len(SbS_IMU['Initial contact'][trial])):
-        df2 = pd.DataFrame({'SubjectID': [trial],
-                        'Trialtype': [trialtype],
-                        'StrideNr': [i],
-                        
-                        'Stride time sensor': [SbS_IMU['Stride time (s)'][trial][i]],
-                        'Stride length sensor': [SbS_IMU['Stride length (m)'][trial][i]],
-                        'Stride velocity sensor': [SbS_IMU['Stride velocity (m/s)'][trial][i]],
-                        'Initial contact sensor': [SbS_IMU['Initial contact'][trial][i]],
-                        'Terminal contact sensor': [SbS_IMU['Terminal contact'][trial][i]],
-                        
-                        'Stride time OMCS': [SbS_OMCS['Stride time (s)'][trial][i]],
-                        'Stride length OMCS': [SbS_OMCS['Stride length (m)'][trial][i]],
-                        'Stride velocity OMCS': [SbS_OMCS['Stride velocity (m/s)'][trial][i]],
-                        'Initial contact OMCS': [SbS_OMCS['Initial contact'][trial][i]],
-                        'Terminal contact OMCS': [SbS_OMCS['Terminal contact'][trial][i]] })
+# # Check for normality
+# stats.shapiro(strides_regular_OMCS['Healthy']['Stride length (m)'])
+# stats.shapiro(strides_regular_OMCS['Healthy']['Stride time (s)'])
+# stats.shapiro(strides_regular_OMCS['Healthy']['Stride velocity (m/s)'])
 
-        if df2.isnull().values.any() == False:
-            # for appending df2 at the end of df1
-            R_formatted_data = R_formatted_data.append(df2, ignore_index = True)
-R_formatted_data.to_excel('R_dataset.xlsx', index=False)
-print ('Saved .xls file for statistical analysis in R')
+# stats.shapiro(strides_regular_OMCS['Stroke']['Stride length (m)'])
+# stats.shapiro(strides_regular_OMCS['Stroke']['Stride time (s)'])
+# stats.shapiro(strides_regular_OMCS['Stroke']['Stride velocity (m/s)'])
+
+# stats.shapiro(strides_overground_OMCS['Stride length (m)'])
+# stats.shapiro(strides_overground_OMCS['Stride time (s)'])
+# stats.shapiro(strides_overground_OMCS['Stride velocity (m/s)'])
+
+# stats.shapiro(strides_regular_OMCS['Healthy']['Initial contact'])
+# stats.shapiro(strides_regular_OMCS['Healthy']['Terminal contact'])
+# stats.shapiro(strides_regular_OMCS['Stroke']['Initial contact'])
+# stats.shapiro(strides_regular_OMCS['Stroke']['Terminal contact'])
+# stats.shapiro(strides_overground_OMCS['Initial contact'])
+# stats.shapiro(strides_overground_OMCS['Terminal contact'])
+
+# # Uncomment this part if you wish to save an .xls file for further statistical analysis in R.
+# R_formatted_data = pd.DataFrame(columns=(['SubjectID', 'Trialtype', 'StrideNr', 'Stride time sensor', 'Stride length sensor', 'Stride velocity sensor', 'Stride time OMCS', 'Stride length OMCS', 'Stride velocity OMCS']))
+# for trial in SbS_IMU['Stride length (m)']:
+#     if trial in files['GRAIL healthy regular']:
+#         trialtype = 'GRAIL healthy regular'
+#     elif trial in files['GRAIL healthy irregular']:
+#         trialtype = 'GRAIL healthy irregular'
+#     elif trial in files['GRAIL stroke regular']:
+#         trialtype = 'GRAIL stroke regular'
+#     elif trial in files['GRAIL stroke irregular']:
+#         trialtype = 'GRAIL stroke irregular'
+#     elif trial in files['Overground']:
+#         trialtype = 'Overground'
+        
+#     for i in range(0, len(SbS_IMU['Initial contact'][trial])):
+#         df2 = pd.DataFrame({'SubjectID': [trial],
+#                         'Trialtype': [trialtype],
+#                         'StrideNr': [i],
+                        
+#                         'Stride time sensor': [SbS_IMU['Stride time (s)'][trial][i]],
+#                         'Stride length sensor': [SbS_IMU['Stride length (m)'][trial][i]],
+#                         'Stride velocity sensor': [SbS_IMU['Stride velocity (m/s)'][trial][i]],
+#                         'Initial contact sensor': [SbS_IMU['Initial contact'][trial][i]],
+#                         'Terminal contact sensor': [SbS_IMU['Terminal contact'][trial][i]],
+                        
+#                         'Stride time OMCS': [SbS_OMCS['Stride time (s)'][trial][i]],
+#                         'Stride length OMCS': [SbS_OMCS['Stride length (m)'][trial][i]],
+#                         'Stride velocity OMCS': [SbS_OMCS['Stride velocity (m/s)'][trial][i]],
+#                         'Initial contact OMCS': [SbS_OMCS['Initial contact'][trial][i]],
+#                         'Terminal contact OMCS': [SbS_OMCS['Terminal contact'][trial][i]] })
+
+#         if df2.isnull().values.any() == False:
+#             # for appending df2 at the end of df1
+#             R_formatted_data = R_formatted_data.append(df2, ignore_index = True)
+# R_formatted_data.to_excel('R_dataset.xlsx', index=False)
+# print ('Saved .xls file for statistical analysis in R')
 
 
 
@@ -521,6 +612,78 @@ for par in strides_overground_IMU:
         md_overground[par] = round(np.nanmean(strides_overground_IMU[par] - strides_overground_OMCS[par]), 2)
         sd_overground[par] = round(np.nanstd(strides_overground_IMU[par] - strides_overground_OMCS[par]), 2)
     loa_overground[par] = np.array([ round(md_overground[par] - 1.96*sd_overground[par], 2)  ,  round(md_overground[par] + 1.96*sd_overground[par], 2) ])
+
+for subjectgroup in strides_regular_OMCS:
+    for par in strides_regular_IMU[subjectgroup]:
+        diff = strides_regular_IMU[subjectgroup][par] - strides_regular_OMCS[subjectgroup][par]
+        diff_unique = np.unique(diff)
+        diff_counts = np.zeros((len(diff_unique,)))
+        for i in range(0,len(diff_unique)):
+            diff_counts[i] = np.count_nonzero(diff == diff_unique[i])
+        plt.bar(diff_unique, diff_counts, width=0.01)
+        plt.title(subjectgroup + ' regular ' + par)
+        
+        diff = strides_irregular_IMU[subjectgroup][par] - strides_irregular_OMCS[subjectgroup][par]
+        stats.shapiro(diff[~np.isnan(diff)])
+        diff_unique = np.unique(diff)
+        diff_counts = np.zeros((len(diff_unique,)))
+        for i in range(0,len(diff_unique)):
+            diff_counts[i] = np.count_nonzero(diff == diff_unique[i])
+        plt.bar(diff_unique, diff_counts, width=0.01)
+        plt.title(subjectgroup + ' irregular ' + par)
+
+# # Calculate median, iqr and LoA for stride length, gait speed, and stride time
+# md_healthy_regular = {}
+# md_healthy_irregular = {}
+# md_stroke_regular = {}
+# md_stroke_irregular = {}
+# md_overground = {}
+
+# iqr_healthy_regular = {}
+# iqr_healthy_irregular = {}
+# iqr_stroke_regular = {}
+# iqr_stroke_irregular = {}
+# iqr_overground = {}
+# for subjectgroup in strides_regular_IMU:
+#     if subjectgroup == 'Healthy':
+#         for par in strides_regular_IMU[subjectgroup]:
+#             if par =='Initial contact' or par == 'Terminal contact': 
+#                 md_healthy_regular[par] = round(np.nanmedian(strides_regular_IMU[subjectgroup][par]/100 - strides_regular_OMCS[subjectgroup][par]/100), 3)
+#                 md_healthy_irregular[par] = round(np.nanmedian(strides_irregular_IMU[subjectgroup][par]/100 - strides_irregular_OMCS[subjectgroup][par]/100), 3)
+#                 iqr_healthy_regular[par] = round(stats.iqr(strides_regular_IMU[subjectgroup][par]/100 - strides_regular_OMCS[subjectgroup][par]/100, nan_policy='omit'), 3)
+#                 iqr_healthy_irregular[par] = round(stats.iqr(strides_irregular_IMU[subjectgroup][par]/100 - strides_irregular_OMCS[subjectgroup][par]/100, nan_policy='omit'), 3)
+                
+#             else:
+#                 md_healthy_regular[par] = round(np.nanmedian(strides_regular_IMU[subjectgroup][par] - strides_regular_OMCS[subjectgroup][par]), 2)
+#                 md_healthy_irregular[par] = round(np.nanmedian(strides_irregular_IMU[subjectgroup][par] - strides_irregular_OMCS[subjectgroup][par]), 2)
+#                 iqr_healthy_regular[par] = round(stats.iqr(strides_regular_IMU[subjectgroup][par] - strides_regular_OMCS[subjectgroup][par], nan_policy='omit'), 2)
+#                 iqr_healthy_irregular[par] = round(stats.iqr(strides_irregular_IMU[subjectgroup][par] - strides_irregular_OMCS[subjectgroup][par], nan_policy='omit'), 2)
+#             # loa_healthy_regular[par] = np.array([ round(md_healthy_regular[par] - 1.96*sd_healthy_regular[par], 2)  ,  round(md_healthy_regular[par] + 1.96*sd_healthy_regular[par], 2) ])
+#             # loa_healthy_irregular[par] = np.array([ round(md_healthy_irregular[par] - 1.96*sd_healthy_irregular[par], 2)  ,  round(md_healthy_irregular[par] + 1.96*sd_healthy_irregular[par], 2) ])
+#     elif subjectgroup == 'Stroke':
+#         for par in strides_regular_IMU[subjectgroup]:
+#             if par =='Initial contact' or par == 'Terminal contact':
+#                 md_stroke_regular[par] = round(np.nanmedian(strides_regular_IMU[subjectgroup][par]/100 - strides_regular_OMCS[subjectgroup][par]/100), 3)
+#                 md_stroke_irregular[par] = round(np.nanmedian(strides_irregular_IMU[subjectgroup][par]/100 - strides_irregular_OMCS[subjectgroup][par]/100), 3)
+#                 iqr_stroke_regular[par] = round(stats.iqr(strides_regular_IMU[subjectgroup][par]/100 - strides_regular_OMCS[subjectgroup][par]/100), 3)
+#                 iqr_stroke_irregular[par] = round(stats.iqr(strides_irregular_IMU[subjectgroup][par]/100 - strides_irregular_OMCS[subjectgroup][par]/100), 3)
+#             else:
+#                 md_stroke_regular[par] = round(np.nanmedian(strides_regular_IMU[subjectgroup][par] - strides_regular_OMCS[subjectgroup][par]), 2)
+#                 md_stroke_irregular[par] = round(np.nanmedian(strides_irregular_IMU[subjectgroup][par] - strides_irregular_OMCS[subjectgroup][par]), 2)
+#                 iqr_stroke_regular[par] = round(stats.iqr(strides_regular_IMU[subjectgroup][par] - strides_regular_OMCS[subjectgroup][par], nan_policy='omit'), 2)
+#                 iqr_stroke_irregular[par] = round(stats.iqr(strides_irregular_IMU[subjectgroup][par] - strides_irregular_OMCS[subjectgroup][par], nan_policy='omit'), 2)
+#             # loa_stroke_regular[par] = np.array([ round(md_stroke_regular[par] - 1.96*sd_stroke_regular[par], 2)  ,  round(md_stroke_regular[par] + 1.96*sd_stroke_regular[par], 2) ])
+#             # loa_stroke_irregular[par] = np.array([ round(md_stroke_irregular[par] - 1.96*sd_stroke_irregular[par], 2)  ,  round(md_stroke_irregular[par] + 1.96*sd_stroke_irregular[par], 2) ])
+
+# for par in strides_overground_IMU:
+#     if par =='Initial contact' or par == 'Terminal contact':
+#         md_overground[par] = round(np.nanmedian(strides_overground_IMU[par]/100 - strides_overground_OMCS[par]/100), 3)
+#         sd_overground[par] = round(stats.iqr(strides_overground_IMU[par]/100 - strides_overground_OMCS[par]/100, nan_policy='omit'), 3)
+#     else:
+#         md_overground[par] = round(np.nanmedian(strides_overground_IMU[par] - strides_overground_OMCS[par]), 2)
+#         sd_overground[par] = round(stats.iqr(strides_overground_IMU[par] - strides_overground_OMCS[par], nan_policy='omit'), 2)
+#     # loa_overground[par] = np.array([ round(md_overground[par] - 1.96*sd_overground[par], 2)  ,  round(md_overground[par] + 1.96*sd_overground[par], 2) ])
+    
     
 
 # Calculate mean, sd and LoA for stride length, gait speed, and stride time per subject 
